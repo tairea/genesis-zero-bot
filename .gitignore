@@ -1,0 +1,8 @@
+# Server-side runtime dirs — not synced or committed
+cron/
+memory/
+sessions/
+state/
+
+# Local-only — not sent to server or committed
+sync-genesis.sh
