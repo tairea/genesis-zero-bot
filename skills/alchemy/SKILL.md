@@ -225,24 +225,31 @@ Send a text message via `telegram-compose` first:
 
 ### Google Drive — upload & share
 
-> **Admin prerequisite:** `GOOGLE_DRIVE_TOKEN` must be set (service account Bearer token).
+> **Admin prerequisite:** `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REFRESH_TOKEN` must be set.
 > Full setup instructions: `{baseDir}/references/admin-setup.md`
 
 ```bash
+# Fetch a fresh access token from the stored refresh token
+GOOGLE_ACCESS_TOKEN=$(curl -s -X POST "https://oauth2.googleapis.com/token" \
+  -d "client_id=${GOOGLE_CLIENT_ID}" \
+  -d "client_secret=${GOOGLE_CLIENT_SECRET}" \
+  -d "refresh_token=${GOOGLE_REFRESH_TOKEN}" \
+  -d "grant_type=refresh_token" | jq -r '.access_token')
+
 UPLOAD=$(curl -s -X POST \
   "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart" \
-  -H "Authorization: Bearer ${GOOGLE_DRIVE_TOKEN}" \
+  -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" \
   -F "metadata={\"name\":\"Community-Alchemy-Playbook-for-{communitySlug}.md\"};type=application/json" \
   -F "file=@${FINAL_FILE};type=text/plain")
 FILE_ID=$(echo $UPLOAD | jq -r '.id')
 
 curl -s -X POST "https://www.googleapis.com/drive/v3/files/${FILE_ID}/permissions" \
-  -H "Authorization: Bearer ${GOOGLE_DRIVE_TOKEN}" \
+  -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" \
   -H "Content-Type: application/json" \
   -d "{\"type\":\"user\",\"role\":\"writer\",\"emailAddress\":\"{userEmail}\"}"
 
 LINK=$(curl -s "https://www.googleapis.com/drive/v3/files/${FILE_ID}?fields=webViewLink" \
-  -H "Authorization: Bearer ${GOOGLE_DRIVE_TOKEN}" | jq -r '.webViewLink')
+  -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" | jq -r '.webViewLink')
 ```
 Send the link via `telegram-compose`. If Google Drive is not configured, say so and offer to resend the file.
 

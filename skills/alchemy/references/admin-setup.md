@@ -28,11 +28,11 @@ curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe" | jq .ok
 
 ---
 
-## 2. Google Drive API — Service Account (Recommended)
+## 2. Google Drive API — OAuth Refresh Token
 
-The skill uploads completed playbooks to Google Drive and shares them with the user's email. This requires a Google Cloud service account with Drive API access.
+The skill uploads completed playbooks to Google Drive and shares them with the user's email. It uses an OAuth refresh token to fetch a fresh access token before each Drive operation — no manual token rotation needed, works indefinitely.
 
-> **Why a service account?** Unlike OAuth user tokens (which expire and need a browser to refresh), service account tokens are automatically refreshed using a JSON key file — no user interaction needed.
+You need three values: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`.
 
 ### 2a. Create a Google Cloud Project
 
@@ -45,70 +45,65 @@ The skill uploads completed playbooks to Google Drive and shares them with the u
 1. In your project, go to **APIs & Services → Library**
 2. Search for **Google Drive API** and click **Enable**
 
-### 2c. Create a Service Account
+### 2c. Create OAuth 2.0 Credentials
 
 1. Go to **APIs & Services → Credentials**
-2. Click **Create Credentials → Service Account**
-3. Give it a name (e.g. `genesis-alchemy`) and click **Create and Continue**
-4. Skip optional role/user grants — click **Done**
-5. Back on the Credentials page, click your new service account
-6. Go to the **Keys** tab → **Add Key → Create new key → JSON**
-7. Download the JSON key file — store it securely on your server (e.g. `/etc/genesis/gdrive-key.json`)
+2. Click **Create Credentials → OAuth client ID**
+3. If prompted, configure the OAuth consent screen first:
+   - User type: **External** → fill in app name and your email → Save
+   - Add scope: `https://www.googleapis.com/auth/drive`
+   - Add yourself as a test user
+4. Back on Create OAuth client ID:
+   - Application type: **Web application**
+   - Under **Authorised redirect URIs**, add: `http://localhost`
+5. Click **Create** — copy your **Client ID** and **Client Secret**
 
-### 2d. Generate an Access Token at Runtime
+### 2d. Get the Refresh Token (one-time, browser-based)
 
-Service accounts use short-lived Bearer tokens generated from the key file. The skill expects `GOOGLE_DRIVE_TOKEN` to be a valid token at runtime.
+Do this once on any machine with a browser. The refresh token you get here never expires unless revoked.
 
-Install the `google-auth-library` helper or use this `curl`+`jwt` approach — or simplest, use the `gcloud` CLI:
-
-```bash
-# One-time: authenticate gcloud with the service account
-gcloud auth activate-service-account --key-file=/etc/genesis/gdrive-key.json
-
-# Generate a token (valid for 1 hour)
-GOOGLE_DRIVE_TOKEN=$(gcloud auth print-access-token)
-export GOOGLE_DRIVE_TOKEN
+**Step 1 — Open this URL in your browser** (replace `YOUR_CLIENT_ID`):
+```
+https://accounts.google.com/o/oauth2/auth?client_id=YOUR_CLIENT_ID&redirect_uri=http://localhost&scope=https://www.googleapis.com/auth/drive&response_type=code&access_type=offline&prompt=consent
 ```
 
-For long-running bots, wrap token refresh in a helper script called before any Drive operation:
+**Step 2 — Authorise** the app with your Google account. You'll be redirected to `http://localhost/?code=...` (the page will fail to load — that's fine). Copy the `code` value from the URL bar.
 
+**Step 3 — Exchange the code for tokens** (replace the placeholders):
 ```bash
-# /usr/local/bin/gdrive-token.sh
-#!/usr/bin/env bash
-gcloud auth activate-service-account --key-file=/etc/genesis/gdrive-key.json --quiet 2>/dev/null
-gcloud auth print-access-token
+curl -s -X POST "https://oauth2.googleapis.com/token" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "code=YOUR_AUTH_CODE" \
+  -d "redirect_uri=http://localhost" \
+  -d "grant_type=authorization_code" | jq '{refresh_token, access_token}'
 ```
 
-Then in the bot environment:
+The response includes a `refresh_token` — **copy and store this securely**. You only get it once (if you lose it, repeat this step).
+
+### 2e. Set Environment Variables on the Server
+
 ```bash
-export GOOGLE_DRIVE_TOKEN=$(bash /usr/local/bin/gdrive-token.sh)
+export GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
+export GOOGLE_CLIENT_SECRET="your-client-secret"
+export GOOGLE_REFRESH_TOKEN="your-refresh-token"
 ```
 
-### 2e. Grant the Service Account Access to a Shared Drive Folder (Optional)
-
-By default, files uploaded by the service account live in the service account's own Drive (not visible to you). To organise completed playbooks in a shared folder:
-
-1. Create a folder in your Google Drive (e.g. `Alchemy Playbooks`)
-2. Share it with the service account's email address (found in the JSON key file under `client_email`) — give it **Editor** access
-3. Note the folder ID from the URL: `drive.google.com/drive/folders/{FOLDER_ID}`
-4. Set `GOOGLE_DRIVE_FOLDER_ID` and update the upload curl in `SKILL.md` to include:
-   ```
-   "parents": ["{FOLDER_ID}"]
-   ```
-   in the metadata JSON.
+Add these to your ZeroClaw `.env` file (see section 3 below). The skill automatically fetches a fresh access token before every Drive operation — no cron job or manual refresh needed.
 
 ---
 
 ## 3. Environment Variables Summary
 
-Set all of these in your OpenClaw server environment before starting the bot:
+Set all of these in your ZeroClaw server environment before starting the bot:
 
 | Variable | Required | Description |
 |---|---|---|
 | `TELEGRAM_BOT_TOKEN` | Yes | From @BotFather |
-| `GOOGLE_DRIVE_TOKEN` | Yes | Short-lived Bearer token from service account |
-| `GOOGLE_DRIVE_FOLDER_ID` | No | Parent folder ID for uploaded playbooks |
-| `ALCHEMY_DATA_DIR` | No | Defaults to `$HOME/.openclaw/alchemy` |
+| `GOOGLE_CLIENT_ID` | Yes | OAuth client ID from Google Cloud Console |
+| `GOOGLE_CLIENT_SECRET` | Yes | OAuth client secret from Google Cloud Console |
+| `GOOGLE_REFRESH_TOKEN` | Yes | Long-lived refresh token from one-time browser flow |
+| `ALCHEMY_DATA_DIR` | No | Defaults to `$HOME/.zeroclaw/alchemy` |
 
 **Recommended:** Store secrets in a `.env` file (never committed to git) and load with:
 ```bash
@@ -143,12 +138,23 @@ curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" 
   -d text="Genesis alchemy skill — admin test" | jq .ok
 ```
 
+### Test token refresh:
+```bash
+GOOGLE_ACCESS_TOKEN=$(curl -s -X POST "https://oauth2.googleapis.com/token" \
+  -d "client_id=${GOOGLE_CLIENT_ID}" \
+  -d "client_secret=${GOOGLE_CLIENT_SECRET}" \
+  -d "refresh_token=${GOOGLE_REFRESH_TOKEN}" \
+  -d "grant_type=refresh_token" | jq -r '.access_token')
+echo $GOOGLE_ACCESS_TOKEN | head -c 20
+# Should print a token starting with "ya29." — not "null"
+```
+
 ### Test Drive upload:
 ```bash
 echo "test" > /tmp/test.txt
 curl -s -X POST \
   "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart" \
-  -H "Authorization: Bearer ${GOOGLE_DRIVE_TOKEN}" \
+  -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" \
   -F "metadata={\"name\":\"test.txt\"};type=application/json" \
   -F "file=@/tmp/test.txt;type=text/plain" | jq .id
 # Should return a file ID, not null
@@ -158,7 +164,7 @@ curl -s -X POST \
 ```bash
 # Using the file ID from above
 curl -s -X POST "https://www.googleapis.com/drive/v3/files/{FILE_ID}/permissions" \
-  -H "Authorization: Bearer ${GOOGLE_DRIVE_TOKEN}" \
+  -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{"type":"user","role":"writer","emailAddress":"youremail@example.com"}' | jq .id
 # Should return a permission ID
@@ -170,8 +176,9 @@ curl -s -X POST "https://www.googleapis.com/drive/v3/files/{FILE_ID}/permissions
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `401 Unauthorized` on Drive calls | Token expired or invalid | Re-run `gcloud auth print-access-token` |
-| `403 Forbidden` on Drive calls | API not enabled or wrong project | Enable Drive API in Cloud Console |
-| `403 Forbidden` on permissions call | Service account can't share files | The file is owned by service account — sharing works but recipient gets a link, not ownership. This is expected. |
+| `401 Unauthorized` on Drive calls | Refresh token invalid or revoked | Repeat step 2d to get a new refresh token |
+| `access_token` is `null` after refresh | Wrong client ID/secret or refresh token | Double-check all three env vars are set correctly |
+| `403 Forbidden` on Drive calls | Drive API not enabled or wrong project | Enable Drive API in Google Cloud Console |
+| `403 Forbidden` on permissions call | Drive scope not granted | Re-do browser auth flow — ensure `drive` scope is included, not just `drive.file` |
 | Telegram `sendDocument` fails | Bot not in chat / chat_id wrong | Ensure user has started the bot (`/start`) before delivery |
 | `FILE_ID` is `null` after upload | Upload failed silently | Check full curl response — often a quota or auth issue |
