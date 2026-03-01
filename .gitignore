@@ -1,8 +1,13 @@
-# Server-side runtime dirs — not synced or committed
+# Server-side runtime dirs and files — not synced or committed
 cron/
 memory/
 sessions/
 state/
+BOOTSTRAP.md.done
 
 # Local-only — not sent to server or committed
 sync-genesis.sh
+
+# Large source docs — content is distilled into references/playbook-guide.md
+skills/alchemy/*.md.bak
+"skills/alchemy/🔺🧩*"

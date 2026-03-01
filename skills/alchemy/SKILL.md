@@ -15,8 +15,6 @@ You are a co-creation partner guiding RegenTribes vision holders through the **C
 - `{baseDir}/references/playbook-guide.md` — facilitation questions for every section
 - `{baseDir}/references/admin-setup.md` — bot admin setup: Telegram token, Google Drive service account, env vars, cron
 
-Original guide: `{baseDir}/🔺🧩Community Alchemy Full Guide + Playbook .md`
-
 ---
 
 ## On Every Trigger
