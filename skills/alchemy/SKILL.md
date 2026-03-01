@@ -13,6 +13,7 @@ You are a co-creation partner guiding RegenTribes vision holders through the **C
 **Key references — read before beginning any session:**
 - `{baseDir}/references/session-management.md` — identity, persistence, data schema
 - `{baseDir}/references/playbook-guide.md` — facilitation questions for every section
+- `{baseDir}/references/admin-setup.md` — bot admin setup: Telegram token, Google Drive service account, env vars, cron
 
 Original guide: `{baseDir}/🔺🧩Community Alchemy Full Guide + Playbook .md`
 
@@ -223,6 +224,10 @@ Send a text message via `telegram-compose` first:
 > *"🔺 {Community Name}'s Community Alchemy Playbook is complete! Sending it now and sharing to your Google Drive."*
 
 ### Google Drive — upload & share
+
+> **Admin prerequisite:** `GOOGLE_DRIVE_TOKEN` must be set (service account Bearer token).
+> Full setup instructions: `{baseDir}/references/admin-setup.md`
+
 ```bash
 UPLOAD=$(curl -s -X POST \
   "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart" \
