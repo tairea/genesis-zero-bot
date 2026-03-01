@@ -105,10 +105,23 @@ Set all of these in your ZeroClaw server environment before starting the bot:
 | `GOOGLE_REFRESH_TOKEN` | Yes | Long-lived refresh token from one-time browser flow |
 | `ALCHEMY_DATA_DIR` | No | Defaults to `$HOME/.zeroclaw/alchemy` |
 
-**Recommended:** Store secrets in a `.env` file (never committed to git) and load with:
+**Store secrets in `/home/ian/.zeroclaw/.env`** (never committed to git). ZeroClaw runs as a user systemd service — load the file via a drop-in config so it's always available at daemon start:
+
 ```bash
-set -a; source /etc/genesis/.env; set +a
+# Create the drop-in directory and config
+mkdir -p ~/.config/systemd/user/zeroclaw.service.d
+cat > ~/.config/systemd/user/zeroclaw.service.d/env.conf << EOF
+[Service]
+EnvironmentFile=/home/ian/.zeroclaw/.env
+EOF
+
+# Reload and restart
+systemctl --user daemon-reload
+systemctl --user restart zeroclaw.service
+systemctl --user status zeroclaw.service
 ```
+
+Do **not** use `source` or `set -a` — systemd services don't read shell profiles.
 
 ---
 
@@ -119,12 +132,7 @@ The skill can send weekly Telegram nudges to users with incomplete guides.
 ```bash
 crontab -e
 # Add this line (runs every Monday at 9am server time):
-0 9 * * 1 set -a; source /etc/genesis/.env; set +a; bash /path/to/skills/alchemy/scripts/weekly-nudge.sh
-```
-
-Or if your env is already loaded by the shell:
-```bash
-0 9 * * 1 TELEGRAM_BOT_TOKEN=your_token bash /path/to/skills/alchemy/scripts/weekly-nudge.sh
+0 9 * * 1 bash -c 'set -a; source /home/ian/.zeroclaw/.env; set +a; exec bash /home/ian/.zeroclaw/workspace/scripts/weekly-nudge.sh'
 ```
 
 ---

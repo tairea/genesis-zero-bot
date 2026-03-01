@@ -157,7 +157,7 @@ For each area:
 4. **Summarise** — reflect their answers in 3–5 sentences at area end.
 5. **Rebuild draft** — run compile script after each area:
    ```bash
-   bash {baseDir}/scripts/compile-draft.sh \
+   bash $HOME/.zeroclaw/workspace/scripts/compile-draft.sh \
      "$PROGRESS_FILE" \
      "$ALCHEMY_DATA_DIR/{telegram_user_id}/draft.md"
    ```
@@ -188,7 +188,7 @@ After Area 11: **Action Plan** (milestones, timeline & tasks, checklist review).
 
 Any time a user asks to see their current document:
 ```bash
-bash {baseDir}/scripts/compile-draft.sh \
+bash $HOME/.zeroclaw/workspace/scripts/compile-draft.sh \
   "$PROGRESS_FILE" \
   "$ALCHEMY_DATA_DIR/{telegram_user_id}/draft.md"
 ```
@@ -208,7 +208,7 @@ echo "$UPDATED" > "$PROGRESS_FILE"
 
 # Build final document
 FINAL_FILE="$ALCHEMY_DATA_DIR/{telegram_user_id}/Community-Alchemy-Playbook-for-{communitySlug}.md"
-bash {baseDir}/scripts/compile-draft.sh "$PROGRESS_FILE" "$FINAL_FILE"
+bash $HOME/.zeroclaw/workspace/scripts/compile-draft.sh "$PROGRESS_FILE" "$FINAL_FILE"
 ```
 
 ### Telegram — file attachment

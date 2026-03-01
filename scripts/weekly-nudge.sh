@@ -10,13 +10,13 @@
 #   TELEGRAM_BOT_TOKEN   — your Telegram bot token
 #
 # Optional env:
-#   ALCHEMY_DATA_DIR     — defaults to ~/.openclaw/alchemy
+#   ALCHEMY_DATA_DIR     — defaults to ~/.zeroclaw/alchemy
 #   INACTIVE_DAYS        — days of inactivity before nudging (default: 3)
 #   NUDGE_COOLDOWN_DAYS  — min days between nudges per user (default: 6)
 
 set -euo pipefail
 
-ALCHEMY_DATA_DIR="${ALCHEMY_DATA_DIR:-$HOME/.openclaw/alchemy}"
+ALCHEMY_DATA_DIR="${ALCHEMY_DATA_DIR:-$HOME/.zeroclaw/alchemy}"
 INACTIVE_DAYS="${INACTIVE_DAYS:-3}"
 NUDGE_COOLDOWN_DAYS="${NUDGE_COOLDOWN_DAYS:-6}"
 NOW_TS=$(date +%s)
