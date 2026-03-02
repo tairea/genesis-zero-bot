@@ -132,7 +132,7 @@ The skill can send weekly Telegram nudges to users with incomplete guides.
 ```bash
 crontab -e
 # Add this line (runs every Monday at 9am server time):
-0 9 * * 1 bash -c 'set -a; source /home/ian/.openclaw/.env; set +a; exec bash /home/ian/.openclaw/workspace/skills/alchemy/scripts/weekly-nudge.sh'
+0 9 * * 1 bash -c 'set -a; source /home/ian/.openclaw/.env; set +a; exec bash /home/ian/.openclaw/workspace-genesis/skills/alchemy/scripts/weekly-nudge.sh'
 ```
 
 ---

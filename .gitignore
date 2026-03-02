@@ -3,6 +3,7 @@ cron/
 memory/
 sessions/
 state/
+.openclaw/
 BOOTSTRAP.md.done
 
 # Local-only — not sent to server or committed
