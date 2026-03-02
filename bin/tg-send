@@ -1,0 +1,16 @@
+#!/bin/bash
+BOT_TOKEN=$(jq -r '.channels.telegram.botToken' ~/.openclaw/openclaw.json)
+CHAT_ID="$1"
+TEXT="$2"
+
+curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+  -H "Content-Type: application/json" \
+  -d "$(jq -n \
+    --arg chat "$CHAT_ID" \
+    --arg text "$TEXT" \
+    '{
+      chat_id: $chat,
+      text: $text,
+      parse_mode: "HTML",
+      link_preview_options: { is_disabled: true }
+    }')"
