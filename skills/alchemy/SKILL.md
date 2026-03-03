@@ -4,7 +4,7 @@ version: 1.0.0
 emoji: 🔺
 description: |
   Guide a RegenTribes community vision holder through the complete Community Alchemy Playbook — all 11 areas — helping them articulate and document their regenerative neighborhood vision section by section. Persists progress per user so sessions can span days, weeks, or months. Resumes where the user left off. Sends a weekly nudge to users with incomplete guides. Triggers on: "community alchemy", "help me plan my community", "guide me through the playbook", "community vision", "regenerative neighborhood", "/alchemy", "resume my guide", "continue alchemy", or any request to start or continue a community planning session.
-metadata: {"openclaw":{"requires":{"bins":["curl","jq","bash","date"],"env":["TELEGRAM_BOT_TOKEN","GOOGLE_CLIENT_ID","GOOGLE_CLIENT_SECRET","GOOGLE_REFRESH_TOKEN"],"os":["linux","darwin"]},"primaryEnv":"TELEGRAM_BOT_TOKEN","network":["api.telegram.org","www.googleapis.com","oauth2.googleapis.com"]}}
+metadata: {"openclaw":{"requires":{"bins":["curl","jq","bash","date","openssl"],"env":["TELEGRAM_BOT_TOKEN","GOOGLE_SERVICE_ACCOUNT_KEY","GENESIS_DRIVE_FOLDER_ID"],"os":["linux","darwin"]},"primaryEnv":"TELEGRAM_BOT_TOKEN","network":["api.telegram.org","www.googleapis.com","oauth2.googleapis.com"]}}
 user-invocable: true
 ---
 
@@ -225,24 +225,47 @@ Send a text message via `telegram-compose` first:
 
 ### Google Drive — upload & share
 
-> **Admin prerequisite:** `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REFRESH_TOKEN` must be set.
+> **Admin prerequisite:** `GOOGLE_SERVICE_ACCOUNT_KEY` and `GENESIS_DRIVE_FOLDER_ID` must be set.
 > Full setup instructions: `{baseDir}/references/admin-setup.md`
 
-```bash
-# Fetch a fresh access token from the stored refresh token
-GOOGLE_ACCESS_TOKEN=$(curl -s -X POST "https://oauth2.googleapis.com/token" \
-  -d "client_id=${GOOGLE_CLIENT_ID}" \
-  -d "client_secret=${GOOGLE_CLIENT_SECRET}" \
-  -d "refresh_token=${GOOGLE_REFRESH_TOKEN}" \
-  -d "grant_type=refresh_token" | jq -r '.access_token')
+Files are uploaded to: `Genesis / Alchemy-Playbooks / {communityName} - {name} /`
 
+```bash
+# Authenticate via service account
+GOOGLE_ACCESS_TOKEN=$(bash {baseDir}/scripts/gdrive-auth.sh "$GOOGLE_SERVICE_ACCOUNT_KEY")
+
+# Helper: find or create a subfolder inside a parent folder
+gdrive_find_or_create_folder() {
+  local PARENT_ID="$1" FOLDER_NAME="$2"
+  # Search for existing folder
+  local EXISTING=$(curl -s -G "https://www.googleapis.com/drive/v3/files" \
+    -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" \
+    --data-urlencode "q=name='${FOLDER_NAME}' and '${PARENT_ID}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false" \
+    --data-urlencode "fields=files(id)" | jq -r '.files[0].id // empty')
+  if [ -n "$EXISTING" ]; then
+    echo "$EXISTING"
+  else
+    # Create folder
+    curl -s -X POST "https://www.googleapis.com/drive/v3/files" \
+      -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" \
+      -H "Content-Type: application/json" \
+      -d "{\"name\":\"${FOLDER_NAME}\",\"mimeType\":\"application/vnd.google-apps.folder\",\"parents\":[\"${PARENT_ID}\"]}" | jq -r '.id'
+  fi
+}
+
+# Build folder path: Genesis / Alchemy-Playbooks / {communityName} - {name}
+PLAYBOOKS_FOLDER_ID=$(gdrive_find_or_create_folder "$GENESIS_DRIVE_FOLDER_ID" "Alchemy-Playbooks")
+USER_FOLDER_ID=$(gdrive_find_or_create_folder "$PLAYBOOKS_FOLDER_ID" "{communityName} - {name}")
+
+# Upload file into user folder
 UPLOAD=$(curl -s -X POST \
   "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart" \
   -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" \
-  -F "metadata={\"name\":\"Community-Alchemy-Playbook-for-{communitySlug}.md\"};type=application/json" \
+  -F "metadata={\"name\":\"Community-Alchemy-Playbook-for-{communitySlug}.md\",\"parents\":[\"${USER_FOLDER_ID}\"]};type=application/json" \
   -F "file=@${FINAL_FILE};type=text/plain")
-FILE_ID=$(echo $UPLOAD | jq -r '.id')
+FILE_ID=$(echo "$UPLOAD" | jq -r '.id')
 
+# Share with user
 curl -s -X POST "https://www.googleapis.com/drive/v3/files/${FILE_ID}/permissions" \
   -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" \
   -H "Content-Type: application/json" \

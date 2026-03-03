@@ -28,68 +28,32 @@ curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe" | jq .ok
 
 ---
 
-## 2. Google Drive API — OAuth Refresh Token
+## 2. Google Drive API — Service Account
 
-The skill uploads completed playbooks to Google Drive and shares them with the user's email. It uses an OAuth refresh token to fetch a fresh access token before each Drive operation — no manual token rotation needed, works indefinitely.
+The skill uploads completed playbooks to a shared Google Drive folder and shares them with the user's email. It uses a **service account** scoped to only the Genesis folder — no access to the rest of the Drive.
 
-You need three values: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`.
+You need two values: `GOOGLE_SERVICE_ACCOUNT_KEY` (path to JSON key file) and `GENESIS_DRIVE_FOLDER_ID`.
 
-### 2a. Create a Google Cloud Project
+### 2a. GCP Project & Service Account (already done)
 
-1. Go to [console.cloud.google.com](https://console.cloud.google.com)
-2. Click **Select a project → New Project**
-3. Name it (e.g. `genesis-bot`) and click **Create**
+Project `openclaw-bots-sunriselabs` with service account `genesis-folder-access@openclaw-bots-sunriselabs.iam.gserviceaccount.com`.
 
-### 2b. Enable the Drive API
+The JSON key file is at: `~/.openclaw/genesis-service-account.json`
 
-1. In your project, go to **APIs & Services → Library**
-2. Search for **Google Drive API** and click **Enable**
+### 2b. Folder Sharing (already done)
 
-### 2c. Create OAuth 2.0 Credentials
+The "Genesis" folder on `ians_ai@sunriselabs.io`'s Google Drive has been shared with the service account email as **Editor**. The service account can only see this folder and its contents.
 
-1. Go to **APIs & Services → Credentials**
-2. Click **Create Credentials → OAuth client ID**
-3. If prompted, configure the OAuth consent screen first:
-   - User type: **External** → fill in app name and your email → Save
-   - Add scope: `https://www.googleapis.com/auth/drive`
-   - Add yourself as a test user
-4. Back on Create OAuth client ID:
-   - Application type: **Web application**
-   - Under **Authorised redirect URIs**, add: `http://localhost`
-5. Click **Create** — copy your **Client ID** and **Client Secret**
+Folder ID: `1fJGG4sAypTpeNRVtcQE-3MaiuYQHhV0w`
 
-### 2d. Get the Refresh Token (one-time, browser-based)
-
-Do this once on any machine with a browser. The refresh token you get here never expires unless revoked.
-
-**Step 1 — Open this URL in your browser** (replace `YOUR_CLIENT_ID`):
-```
-https://accounts.google.com/o/oauth2/auth?client_id=YOUR_CLIENT_ID&redirect_uri=http://localhost&scope=https://www.googleapis.com/auth/drive&response_type=code&access_type=offline&prompt=consent
-```
-
-**Step 2 — Authorise** the app with your Google account. You'll be redirected to `http://localhost/?code=...` (the page will fail to load — that's fine). Copy the `code` value from the URL bar.
-
-**Step 3 — Exchange the code for tokens** (replace the placeholders):
-```bash
-curl -s -X POST "https://oauth2.googleapis.com/token" \
-  -d "client_id=YOUR_CLIENT_ID" \
-  -d "client_secret=YOUR_CLIENT_SECRET" \
-  -d "code=YOUR_AUTH_CODE" \
-  -d "redirect_uri=http://localhost" \
-  -d "grant_type=authorization_code" | jq '{refresh_token, access_token}'
-```
-
-The response includes a `refresh_token` — **copy and store this securely**. You only get it once (if you lose it, repeat this step).
-
-### 2e. Set Environment Variables on the Server
+### 2c. Set Environment Variables on the Server
 
 ```bash
-export GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
-export GOOGLE_CLIENT_SECRET="your-client-secret"
-export GOOGLE_REFRESH_TOKEN="your-refresh-token"
+GOOGLE_SERVICE_ACCOUNT_KEY="/home/ian/.openclaw/genesis-service-account.json"
+GENESIS_DRIVE_FOLDER_ID="1fJGG4sAypTpeNRVtcQE-3MaiuYQHhV0w"
 ```
 
-Add these to your ZeroClaw `.env` file (see section 3 below). The skill automatically fetches a fresh access token before every Drive operation — no cron job or manual refresh needed.
+Add these to your OpenClaw `.env` file (see section 3 below). The skill uses `scripts/gdrive-auth.sh` to mint a fresh access token via JWT before every Drive operation — no manual refresh needed, no token expiry to worry about.
 
 ---
 
@@ -100,9 +64,8 @@ Set all of these in your OpenClaw server environment before starting the bot:
 | Variable | Required | Description |
 |---|---|---|
 | `TELEGRAM_BOT_TOKEN` | Yes | From @BotFather |
-| `GOOGLE_CLIENT_ID` | Yes | OAuth client ID from Google Cloud Console |
-| `GOOGLE_CLIENT_SECRET` | Yes | OAuth client secret from Google Cloud Console |
-| `GOOGLE_REFRESH_TOKEN` | Yes | Long-lived refresh token from one-time browser flow |
+| `GOOGLE_SERVICE_ACCOUNT_KEY` | Yes | Path to service account JSON key file (e.g. `~/.openclaw/genesis-service-account.json`) |
+| `GENESIS_DRIVE_FOLDER_ID` | Yes | Google Drive folder ID for the Genesis folder (`1fJGG4sAypTpeNRVtcQE-3MaiuYQHhV0w`) |
 | `ALCHEMY_DATA_DIR` | No | Defaults to `$HOME/.openclaw/alchemy` |
 
 **Store secrets in `/home/ian/.openclaw/.env`** (never committed to git). OpenClaw runs as a user systemd service — load the file via a drop-in config so it's always available at daemon start:
@@ -146,26 +109,22 @@ curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" 
   -d text="Genesis alchemy skill — admin test" | jq .ok
 ```
 
-### Test token refresh:
+### Test service account auth:
 ```bash
-GOOGLE_ACCESS_TOKEN=$(curl -s -X POST "https://oauth2.googleapis.com/token" \
-  -d "client_id=${GOOGLE_CLIENT_ID}" \
-  -d "client_secret=${GOOGLE_CLIENT_SECRET}" \
-  -d "refresh_token=${GOOGLE_REFRESH_TOKEN}" \
-  -d "grant_type=refresh_token" | jq -r '.access_token')
-echo $GOOGLE_ACCESS_TOKEN | head -c 20
+GOOGLE_ACCESS_TOKEN=$(bash /path/to/skills/alchemy/scripts/gdrive-auth.sh "$GOOGLE_SERVICE_ACCOUNT_KEY")
+echo "$GOOGLE_ACCESS_TOKEN" | head -c 20
 # Should print a token starting with "ya29." — not "null"
 ```
 
-### Test Drive upload:
+### Test Drive upload to Genesis folder:
 ```bash
 echo "test" > /tmp/test.txt
 curl -s -X POST \
   "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart" \
   -H "Authorization: Bearer ${GOOGLE_ACCESS_TOKEN}" \
-  -F "metadata={\"name\":\"test.txt\"};type=application/json" \
+  -F "metadata={\"name\":\"test.txt\",\"parents\":[\"${GENESIS_DRIVE_FOLDER_ID}\"]};type=application/json" \
   -F "file=@/tmp/test.txt;type=text/plain" | jq .id
-# Should return a file ID, not null
+# Should return a file ID, not null — file appears inside the Genesis folder
 ```
 
 ### Test file sharing:
@@ -184,9 +143,9 @@ curl -s -X POST "https://www.googleapis.com/drive/v3/files/{FILE_ID}/permissions
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `401 Unauthorized` on Drive calls | Refresh token invalid or revoked | Repeat step 2d to get a new refresh token |
-| `access_token` is `null` after refresh | Wrong client ID/secret or refresh token | Double-check all three env vars are set correctly |
-| `403 Forbidden` on Drive calls | Drive API not enabled or wrong project | Enable Drive API in Google Cloud Console |
-| `403 Forbidden` on permissions call | Drive scope not granted | Re-do browser auth flow — ensure `drive` scope is included, not just `drive.file` |
+| `access_token` is `null` from gdrive-auth.sh | Service account JSON missing or malformed | Check `GOOGLE_SERVICE_ACCOUNT_KEY` path and that the file is valid JSON |
+| `401 Unauthorized` on Drive calls | Token expired or auth script failed | Re-run gdrive-auth.sh — tokens last 1 hour |
+| `403 Forbidden` on Drive calls | Drive API not enabled on the project | Enable Drive API in Google Cloud Console for `openclaw-bots-sunriselabs` |
+| `404 Not Found` on folder operations | Folder not shared with service account | Re-share the Genesis folder with the service account email as Editor |
 | Telegram `sendDocument` fails | Bot not in chat / chat_id wrong | Ensure user has started the bot (`/start`) before delivery |
 | `FILE_ID` is `null` after upload | Upload failed silently | Check full curl response — often a quota or auth issue |

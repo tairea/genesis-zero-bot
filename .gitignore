@@ -7,10 +7,20 @@ state/
 BOOTSTRAP.md
 BOOTSTRAP.md.done
 MEMORY.md
-TOOLS.md
+bin/
 
 # Local-only — not sent to server or committed
 sync-genesis.sh
+
+# Third-party skills (installed via clawhub, not maintained here)
+skills/deep-research-pro/
+skills/dreamcatcher/
+skills/find-skills/
+skills/gog/
+skills/summarize/
+skills/telegram/
+skills/transcribe/
+skills/web-search/
 
 # Large source docs — content is distilled into references/playbook-guide.md
 skills/alchemy/*.md.bak
