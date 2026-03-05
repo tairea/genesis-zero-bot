@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>XTRACT 3D Graph</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font: 12px system-ui, sans-serif; 
+            background: #0a0a0f; 
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        #graph { width: 100vw; height: 100vh; }
+        
+        .panel {
+            position: fixed;
+            background: rgba(15, 15, 25, 0.92);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 12px;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        
+        #stats { top: 12px; left: 12px; min-width: 120px; }
+        #legend { top: 12px; right: 12px; font-size: 11px; }
+        #tooltip { 
+            display: none; 
+            max-width: 260px;
+            pointer-events: none;
+        }
+        #tooltip.visible { display: block; }
+        #tooltip h4 { color: #00d4ff; margin-bottom: 4px; font-size: 13px; word-break:break-word; }
+        #tooltip .type { 
+            display: inline-block; padding: 2px 6px; border-radius: 3px; 
+            font-size: 10px; margin-bottom: 6px; 
+        }
+        #tooltip .meta { font-size: 11px; color: #888; line-height: 1.4; }
+        
+        .stat { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .stat .label { color: #666; }
+        .stat .val { color: #fff; font-weight: 500; }
+        
+        .legend-item { display: flex; align-items: center; margin-bottom: 3px; }
+        .legend-color { width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        
+        #loading {
+            position: fixed; inset: 0; background: #0a0a0f;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; transition: opacity 0.3s;
+        }
+        #loading.hidden { opacity: 0; pointer-events: none; }
+        
+        #help {
+            position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+            font-size: 11px; color: #444;
+        }
+        kbd { background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div id="loading"><span>Loading graph...</span></div>
+    <div id="graph"></div>
+    
+    <div id="stats" class="panel">
+        <div class="stat"><span class="label">Nodes</span><span class="val" id="node-count">0</span></div>
+        <div class="stat"><span class="label">Edges</span><span class="val" id="edge-count">0</span></div>
+    </div>
+    
+    <div id="legend" class="panel">
+        <div class="legend-item"><span class="legend-color" style="background:#00d4ff"></span>Entity</div>
+        <div class="legend-item"><span class="legend-color" style="background:#ff6b35"></span>System</div>
+        <div class="legend-item"><span class="legend-color" style="background:#7b2cbf"></span>Process</div>
+        <div class="legend-item"><span class="legend-color" style="background:#2ec4b6"></span>Idea</div>
+    </div>
+    
+    <div id="tooltip" class="panel">
+        <h4 id="tt-name"></h4>
+        <span class="type" id="tt-type"></span>
+        <div class="meta" id="tt-meta"></div>
+    </div>
+    
+    <div id="help"><kbd>Scroll</kbd> zoom · <kbd>Drag</kbd> rotate · <kbd>Hover</kbd> details</div>
+
+    <script type="module">
+        import * as Surreal from 'https://cdn.jsdelivr.net/npm/surrealdb@1.0.8/+esm';
+        
+        const URL = 'ws://127.0.0.1:8000';
+        const NS = 'xtract_graph';
+        const DB = 'main';
+        
+        const COLORS = {
+            entity: '#00d4ff', system: '#ff6b35', process: '#7b2cbf', 
+            idea: '#2ec4b6', event: '#ffbe0b', default: '#666'
+        };
+        
+        let graphData = { nodes: [], links: [] };
+        let nodeMap = new Map();
+        
+        // Load from SurrealDB
+        async function load() {
+            const db = await Surreal.connect(URL);
+            await db.signin({ username: 'root', password: 'DLkelAlX8ucXPRUKBVPh5dYp9xZ5Y+IZ' });
+            await db.use(NS, DB);
+            
+            const concepts = await db.query('SELECT * FROM concept');
+            graphData.nodes = concepts.map(c => ({
+                id: c.id?.record_id || c.name,
+                name: c.name,
+                type: c.type || 'entity',
+                fp: c.fingerprint,
+                conf: c.nars_confidence || 0.5,
+                ev: c.evidence_count || 1
+            }));
+            
+            const rels = await db.query('SELECT verb, in, out FROM relates');
+            graphData.links = rels.map(r => ({
+                verb: r.verb,
+                source: r.in?.record_id,
+                target: r.out?.record_id
+            })).filter(l => l.source && l.target);
+            
+            graphData.nodes.forEach(n => nodeMap.set(n.id, n));
+            
+            document.getElementById('node-count').textContent = graphData.nodes.length;
+            document.getElementById('edge-count').textContent = graphData.links.length;
+            
+            await db.close();
+            initGraph();
+        }
+        
+        function initGraph() {
+            const g3d = ForceGraph3D()(
+                document.getElementById('graph')
+            )
+            .graphData(graphData)
+            .backgroundColor('#0a0a0f')
+            .nodeResolution(8)
+            .linkResolution(2)
+            .nodeColor(n => COLORS[n.type] || COLORS.default)
+            .nodeVal(n => Math.max(1, Math.sqrt(n.ev) * 1.5))
+            .nodeOpacity(0.85)
+            .linkWidth(0.3)
+            .linkOpacity(0.3)
+            .linkDirectionalArrowLength(2)
+            .linkDirectionalArrowRelPos(0.95)
+            
+            // Hover - show tooltip
+            .onNodeHover(node => {
+                const tt = document.getElementById('tooltip');
+                if (node) {
+                    tt.classList.add('visible');
+                    tt.style.left = (event?.clientX || 0) + 15 + 'px';
+                    tt.style.top = (event?.clientY || 0) + 15 + 'px';
+                    
+                    document.getElementById('tt-name').textContent = node.name;
+                    const typeEl = document.getElementById('tt-type');
+                    typeEl.textContent = node.type;
+                    typeEl.style.background = COLORS[node.type] || COLORS.default;
+                    typeEl.style.color = '#000';
+                    
+                    document.getElementById('tt-meta').innerHTML = 
+                        `Confidence: ${node.conf?.toFixed(2) || '0.50'}<br>Evidence: ${node.ev || 1}`;
+                    
+                    // Highlight
+                    g3d.nodeOpacity(n => n === node ? 1 : 0.3);
+                } else {
+                    tt.classList.remove('visible');
+                    g3d.nodeOpacity(0.85);
+                }
+            })
+            
+            // Disable click
+            .onNodeClick(() => {})
+            .onBackgroundClick(() => {})
+            
+            // Optimize
+            g3d.d3AlphaDecay(0.05).d3VelocityDecay(0.3);
+            
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+                g3d.zoomToFit(1500);
+            }, 500);
+        }
+        
+        // Load Three.js and 3d-force-graph
+        const three = document.createElement('script');
+        three.src = 'https://unpkg.com/three';
+        three.onload = () => {
+            const fg = document.createElement('script');
+            fg.src = 'https://unpkg.com/3d-force-graph';
+            fg.onload = load;
+            document.head.appendChild(fg);
+        };
+        document.head.appendChild(three);
+    </script>
+</body>
+</html>

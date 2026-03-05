@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Graph Visualization </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #graph-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #info-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 15, 25, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px 20px;
+            max-width: 320px;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        #info-panel h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        #info-panel .stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        #info-panel .stat:last-child {
+            border-bottom: none;
+        }
+        
+        #info-panel .label {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        #info-panel .value {
+            color: #fff;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        #node-details {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(15, 15, 25, 0.95);
+            border: 1px solid rgba(, 255, 0.1255, 255);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 400px;
+            z-index: 100;
+            display: none;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        #node-details.visible {
+            display: block;
+        }
+        
+        #node-details h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        
+        #node-details .type-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        
+        #node-details p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #aaa;
+            margin-bottom: 12px;
+        }
+        
+        #node-details .meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        #node-details .meta-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 10px;
+            border-radius: 6px;
+        }
+        
+        #node-details .meta-item .label {
+            color: #666;
+            display: block;
+            margin-bottom: 2px;
+        }
+        
+        #node-details .meta-item .val {
+            color: #fff;
+        }
+        
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(15, 15, 25, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        
+        #controls label {
+            display: block;
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        
+        #controls select, #controls input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 13px;
+            margin-bottom: 12px;
+            width: 140px;
+        }
+        
+        #controls select:focus, #controls input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        #controls button {
+            background: linear-gradient(135deg, #2ec4b6, #00d4ff);
+            border: none;
+            border-radius: 6px;
+            color: #000;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        #controls button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(46, 196, 182, 0.3);
+        }
+        
+        .legend {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 15, 25, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            font-size: 11px;
+        }
+        
+        .legend h4 {
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            font-size: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 25, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 30px;
+            padding: 10px 24px;
+            font-size: 12px;
+            color: #666;
+            z-index: 50;
+            backdrop-filter: blur(8px);
+        }
+        
+        .instructions kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: inherit;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div id="graph-container"></div>
+    
+    <div id="info-panel">
+        <h2>Graph Stats</h2>
+        <div class="stat">
+            <span class="label">Nodes</span>
+            <span class="value" id="node-count">0</span>
+        </div>
+        <div class="stat">
+            <span class="label">Edges</span>
+            <span class="value" id="link-count">0</span>
+        </div>
+        <div class="stat">
+            <span class="label">Version</span>
+            <span class="value">1.0.0</span>
+        </div>
+    </div>
+    
+    <div id="node-details">
+        <h3 id="detail-name">-</h3>
+        <span class="type-badge" id="detail-type">-</span>
+        <p id="detail-description">-</p>
+        <div class="meta">
+            <div class="meta-item">
+                <span class="label">Rung</span>
+                <span class="val" id="detail-rung">-</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">Confidence</span>
+                <span class="val" id="detail-confidence">-</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">Evidence</span>
+                <span class="val" id="detail-evidence">-</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">Frequency</span>
+                <span class="val" id="detail-frequency">-</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="legend">
+        <h4>Node Types</h4>
+        <div class="legend-item"><span class="legend-color" style="background:#00d4ff"></span>Entity</div>
+        <div class="legend-item"><span class="legend-color" style="background:#ff6b35"></span>System</div>
+        <div class="legend-item"><span class="legend-color" style="background:#7b2cbf"></span>Process</div>
+        <div class="legend-item"><span class="legend-color" style="background:#2ec4b6"></span>Idea</div>
+        <div class="legend-item"><span class="legend-color" style="background:#ffbe0b"></span>Event</div>
+    </div>
+    
+    <div id="controls">
+        <label>Focus Depth</label>
+        <select id="depth-select">
+            <option value="1">1 hop</option>
+            <option value="2" selected>2 hops</option>
+            <option value="3">3 hops</option>
+            <option value="4">4 hops</option>
+            <option value="5">5 hops</option>
+        </select>
+        <label>Node Size</label>
+        <select id="size-select">
+            <option value="evidence" selected>Evidence Count</option>
+            <option value="confidence">Confidence</option>
+            <option value="fixed">Fixed</option>
+        </select>
+        <button id="reset-camera">Reset View</button>
+    </div>
+    
+    <div class="instructions">
+        <kbd>Click</kbd> node to focus · <kbd>Scroll</kbd> zoom · <kbd>Drag</kbd> rotate · <kbd>WASD</kbd> fly
+    </div>
+
+    <script src="https://unpkg.com/three"></script>
+    <script src="https://unpkg.com/3d-force-graph"></script>
+    <script>
+        // Embedded graph data
+        const graphData = {
+            nodes: [{"id": "0bpj3nffr78ccsecqq2s", "fullId": "concept:0bpj3nffr78ccsecqq2s", "name": "Energy Management", "type": "system", "description": "Circular energy systems", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "0jmcb4c9mek1gazpwn9d", "fullId": "concept:0jmcb4c9mek1gazpwn9d", "name": "Regenerative Neighborhood Development", "type": "entity", "description": "Overall context", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "0zhiso7onbskg0gzhznv", "fullId": "concept:0zhiso7onbskg0gzhznv", "name": "Information Gates", "type": "process", "description": "Data-driven milestones", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "1f41j1snlqz28f8hqa1t", "fullId": "concept:1f41j1snlqz28f8hqa1t", "name": "Stewardship Setup", "type": "process", "description": "Long-term maintenance", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "2fxr1f1r5ij4fr79fnx6", "fullId": "concept:2fxr1f1r5ij4fr79fnx6", "name": "Governance Design", "type": "process", "description": "Creating decision structures", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "2i79wmynqempwlivuum1", "fullId": "concept:2i79wmynqempwlivuum1", "name": "Social Integration", "type": "process", "description": "Social systems thinking", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "2ug4cajifx9z6i6knkr8", "fullId": "concept:2ug4cajifx9z6i6knkr8", "name": "Sustainable Eco-Housing", "type": "project", "description": "A housing project designed to benefit environment", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "2yxqk9i0a2k78810uauw", "fullId": "concept:2yxqk9i0a2k78810uauw", "name": "Legacy Transfer", "type": "process", "description": "Knowledge passing", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "32egtnz6bneuj79cs2hm", "fullId": "concept:32egtnz6bneuj79cs2hm", "name": "11-Step Alchemy Process", "type": "process", "description": "Sequential transformation process", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "44tj4sddvyf4qtvxmeww", "fullId": "concept:44tj4sddvyf4qtvxmeww", "name": "Digital Layer", "type": "layer", "description": "Technology coordination systems", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "4syimrxqwxlls6u5go4q", "fullId": "concept:4syimrxqwxlls6u5go4q", "name": "Resource Mapping", "type": "process", "description": "Understanding community resources", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "6270wesse5r0v35w8stu", "fullId": "concept:6270wesse5r0v35w8stu", "name": "Artificial Lake", "type": "entity", "description": "Central water feature in hexagonal layout", "rung": 1, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "64rjy3bktxuvr956a2pu", "fullId": "concept:64rjy3bktxuvr956a2pu", "name": "Approved words", "type": "entity", "description": "A controlled language rule requiring pre-approved vocabulary", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "6wzieqcw07uqfebw1410", "fullId": "concept:6wzieqcw07uqfebw1410", "name": "Convergence", "type": "idea", "description": "Alignment of group perspectives", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "74esttstlg9prd89rh6t", "fullId": "concept:74esttstlg9prd89rh6t", "name": "Integration Gates", "type": "system", "description": "Convergence-based sequencing model", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "77jshkrtkqx0pf8iz5pz", "fullId": "concept:77jshkrtkqx0pf8iz5pz", "name": "Consensus-based Decision Making", "type": "process", "description": "All members agree", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "7u3l3mu9wygbeguhtx5n", "fullId": "concept:7u3l3mu9wygbeguhtx5n", "name": "Divergence-Amplitude Model", "type": "system", "description": "Tracks group divergence from intent", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "7vu8bwf2p7ub7pxl62lt", "fullId": "concept:7vu8bwf2p7ub7pxl62lt", "name": "Ecological Integration", "type": "idea", "description": "Design combining living spaces with ecology", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "878mf0zj4exfbe22yxrt", "fullId": "concept:878mf0zj4exfbe22yxrt", "name": "Governance Layer", "type": "layer", "description": "Decision making structures", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "8unwm6noynkzv1h35ket", "fullId": "concept:8unwm6noynkzv1h35ket", "name": "Hexagonal Pattern", "type": "idea", "description": "Arrangement of 6 towers surrounding center", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "9zjnqdj8m7ty7ih62dn4", "fullId": "concept:9zjnqdj8m7ty7ih62dn4", "name": "Divergence", "type": "idea", "description": "Drift from original intent", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "a8b9orzerqn3glz762cj", "fullId": "concept:a8b9orzerqn3glz762cj", "name": "Energy Systems", "type": "system", "description": "Power generation infrastructure", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "aaas1roeqecomyd2unfo", "fullId": "concept:aaas1roeqecomyd2unfo", "name": "Governance", "type": "entity", "description": "Decision-making structures", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "aic85bla45suzugecwd4", "fullId": "concept:aic85bla45suzugecwd4", "name": "Regenerative Design", "type": "process", "description": "Buildings that heal environment", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "anknq6fq4oiyxcj91xxg", "fullId": "concept:anknq6fq4oiyxcj91xxg", "name": "Semi-Intensive Closed-Loop", "type": "system", "description": "Aquaculture that recycles water", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "axuui5zwl4brn2r2adqo", "fullId": "concept:axuui5zwl4brn2r2adqo", "name": "Regenerative Neighborhood", "type": "system", "description": "Self-sustaining community design", "rung": 3, "nars_frequency": 0.9, "nars_confidence": 0.8, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "b2ge5er8t7e7ylb2vq51", "fullId": "concept:b2ge5er8t7e7ylb2vq51", "name": "Central Aquaculture Lake", "type": "system", "description": "Fish farming in closed-loop system", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "buffyof07mj5xur876vx", "fullId": "concept:buffyof07mj5xur876vx", "name": "Community Investment", "type": "process", "description": "Financial contributions from members", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "c8y5dx8hq1nt1am0ldbb", "fullId": "concept:c8y5dx8hq1nt1am0ldbb", "name": "Density", "type": "concept", "description": "Population density through vertical housing", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "cafs1kwwvfldt94zn63a", "fullId": "concept:cafs1kwwvfldt94zn63a", "name": "Capacity Mapping", "type": "process", "description": "Understanding community resources", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "cgl7gzx0cpzdha1hezh8", "fullId": "concept:cgl7gzx0cpzdha1hezh8", "name": "Time Banking", "type": "system", "description": "Hours as currency exchange", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "dap3ewoejhpnvpvtmszl", "fullId": "concept:dap3ewoejhpnvpvtmszl", "name": "European Defense", "type": "system", "description": "European defense capabilities", "rung": 3, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "dbeccidv8dua006tk9ts", "fullId": "concept:dbeccidv8dua006tk9ts", "name": "Ecological Integration", "type": "process", "description": "Ecological systems thinking", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "dlyhryoewnrnnqelnd11", "fullId": "concept:dlyhryoewnrnnqelnd11", "name": "Aerospace maintenance manuals", "type": "entity", "description": "Technical documents for aircraft maintenance", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "drcy6zdnm8zcyhlgie87", "fullId": "concept:drcy6zdnm8zcyhlgie87", "name": "Aerospace Industry", "type": "system", "description": "Aerospace manufacturing and defense sector", "rung": 2, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "dtj98ta03cy3oixdbb21", "fullId": "concept:dtj98ta03cy3oixdbb21", "name": "Community Governance", "type": "system", "description": "Consensus-based decision making", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "dydmvqpsh19gpevin6c4", "fullId": "concept:dydmvqpsh19gpevin6c4", "name": "Data module structure", "type": "system", "description": "One of the two main parts of ASD-STE100", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "eacmw6yq1emuix14cno8", "fullId": "concept:eacmw6yq1emuix14cno8", "name": "Reduced translation costs", "type": "idea", "description": "Benefit due to simpler language", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "ehw1rnyaedgbklj1x4z1", "fullId": "concept:ehw1rnyaedgbklj1x4z1", "name": "Greenhouse", "type": "entity", "description": "Controlled environment agriculture", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "ekz66tnkifvcqqpfaqbc", "fullId": "concept:ekz66tnkifvcqqpfaqbc", "name": "Biological Layer", "type": "layer", "description": "Living systems food water energy", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "f9hu3iievecsztzdwidc", "fullId": "concept:f9hu3iievecsztzdwidc", "name": "Financial Models", "type": "system", "description": "Community investment time banking", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "ffvrj0m82jx74tmguc71", "fullId": "concept:ffvrj0m82jx74tmguc71", "name": "Economic Integration", "type": "process", "description": "Economic systems thinking", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "flon3gqqhs3074hu316j", "fullId": "concept:flon3gqqhs3074hu316j", "name": "Short clear sentences", "type": "idea", "description": "A controlled language rule requiring brevity", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "fmf417b52kk5uu132xu6", "fullId": "concept:fmf417b52kk5uu132xu6", "name": "Biological Design", "type": "process", "description": "Food water energy systems", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "g3v27jxv8dushckr3lvo", "fullId": "concept:g3v27jxv8dushckr3lvo", "name": "Easier maintenance", "type": "idea", "description": "Benefit of using ASD-STE100", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "g9v5ed3qbjjt67r4f87d", "fullId": "concept:g9v5ed3qbjjt67r4f87d", "name": "One instruction per sentence", "type": "process", "description": "Rule limiting each sentence to single instruction", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "h9v2f5agxscl61mpzjwm", "fullId": "concept:h9v2f5agxscl61mpzjwm", "name": "5-Pillar Structure", "type": "system", "description": "Nested 5-layer framework", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "hgqj96lglwpdt1np1l95", "fullId": "concept:hgqj96lglwpdt1np1l95", "name": "Alignment Checks", "type": "process", "description": "Regular synchronization points", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "ho12yeb65tql1u3gsqyx", "fullId": "concept:ho12yeb65tql1u3gsqyx", "name": "Relationship Weaving", "type": "process", "description": "Building trust networks", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "hrd9tpzjtfsn2xllayjo", "fullId": "concept:hrd9tpzjtfsn2xllayjo", "name": "Biogas", "type": "system", "description": "Renewable energy from organic matter", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "hyym6nvpckidhvfreojz", "fullId": "concept:hyym6nvpckidhvfreojz", "name": "Housing", "type": "system", "description": "Residential dwellings for environmental benefit", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "i4vqook3q7pmy70snxgp", "fullId": "concept:i4vqook3q7pmy70snxgp", "name": "Resource Flows", "type": "entity", "description": "Movement of resources", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "ipkplhm41rsr9hml1fa3", "fullId": "concept:ipkplhm41rsr9hml1fa3", "name": "Ecology Operating System", "type": "idea", "description": "Ecology underlies all systems", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "j3kkxzaxyvnr5d318n1t", "fullId": "concept:j3kkxzaxyvnr5d318n1t", "name": "Green Circles", "type": "place", "description": "Agricultural areas surrounding towers", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#06d6a0", "val": 1}, {"id": "jdo75o4mr7parwic2riu", "fullId": "concept:jdo75o4mr7parwic2riu", "name": "Solar Garden", "type": "project", "description": "Community solar energy project", "rung": 1, "nars_frequency": 0.5, "nars_confidence": 0.5, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "jxasnxa020fukyikkbud", "fullId": "concept:jxasnxa020fukyikkbud", "name": "Resonance Scoring", "type": "process", "description": "Collective feeling metrics", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "kf01makqpar44ds3anv0", "fullId": "concept:kf01makqpar44ds3anv0", "name": "Vision Holding", "type": "process", "description": "Creating shared future vision", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "kgnt4d9qvnw45nhkqi0z", "fullId": "concept:kgnt4d9qvnw45nhkqi0z", "name": "Physical Layer", "type": "layer", "description": "Infrastructure buildings roads utilities", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "kmvfbcc4bf5v6d5paswk", "fullId": "concept:kmvfbcc4bf5v6d5paswk", "name": "Photovoltaic", "type": "system", "description": "Solar panel technology", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "ltw0r5zcwmab7b0yrp26", "fullId": "concept:ltw0r5zcwmab7b0yrp26", "name": "Technical documentation", "type": "entity", "description": "Written materials that explain how to use or maintain something", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "netcuw174ry84w17xkh4", "fullId": "concept:netcuw174ry84w17xkh4", "name": "Resource-Flow Mapping", "type": "system", "description": "Map resources before governance", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "o88xrc16e8heke4sn9n1", "fullId": "concept:o88xrc16e8heke4sn9n1", "name": "Vision", "type": "idea", "description": "Communities that give back more than take", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "oaq17b2j9tykoqq22e9s", "fullId": "concept:oaq17b2j9tykoqq22e9s", "name": "Community Capital", "type": "entity", "description": "Local investment in local projects", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "p5j62ja39t3s605zs81w", "fullId": "concept:p5j62ja39t3s605zs81w", "name": "ASD-STE100", "type": "specification", "description": "A specification for writing technical documentation", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "pbjyd3ye4hlipnpv6j0v", "fullId": "concept:pbjyd3ye4hlipnpv6j0v", "name": "Energetic Resonance", "type": "idea", "description": "Collective energy state", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "pc2ffxpbtditme6ye7tg", "fullId": "concept:pc2ffxpbtditme6ye7tg", "name": "Regenerative Neighborhood Framework", "type": "system", "description": "Comprehensive approach to sustainable communities", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "phz840cfru4l8f0hjdqo", "fullId": "concept:phz840cfru4l8f0hjdqo", "name": "Central Artificial Lake", "type": "place", "description": "Man-made lake at center of layout", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#06d6a0", "val": 1}, {"id": "pm8nb18rils2pocucizp", "fullId": "concept:pm8nb18rils2pocucizp", "name": "Financial Architecture", "type": "process", "description": "Designing investment systems", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "puw7f3tibkkthzuechar", "fullId": "concept:puw7f3tibkkthzuechar", "name": "Controlled language", "type": "system", "description": "One of the two main parts of ASD-STE100", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "q9mlnstuiv78myyb6toe", "fullId": "concept:q9mlnstuiv78myyb6toe", "name": "Circular Economy", "type": "system", "description": "Zero waste closed-loop", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "qfwnzkkurmuu5l6f12z4", "fullId": "concept:qfwnzkkurmuu5l6f12z4", "name": "Food Management", "type": "system", "description": "Circular food systems", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "qfyhnvrx7twi92wj4cqb", "fullId": "concept:qfyhnvrx7twi92wj4cqb", "name": "Circular Systems", "type": "system", "description": "Integrated water food energy waste", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "qqhwxoyjtt95c48dbcrf", "fullId": "concept:qqhwxoyjtt95c48dbcrf", "name": "Security", "type": "concept", "description": "Defense and security industry", "rung": 2, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "qs70p79k8wupdng4ge10", "fullId": "concept:qs70p79k8wupdng4ge10", "name": "Residential Tower", "type": "entity", "description": "6 residential towers in hexagonal pattern", "rung": 1, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#00d4ff", "val": 1}, {"id": "qvxcgidvwzm2o9c1k5ig", "fullId": "concept:qvxcgidvwzm2o9c1k5ig", "name": "Consistent documentation", "type": "idea", "description": "Benefit of using ASD-STE100", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "riqjv67cu8kq7nlumahw", "fullId": "concept:riqjv67cu8kq7nlumahw", "name": "Emotional Resonance", "type": "idea", "description": "Collective emotional state", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "rl99efjs5sej75heqe5g", "fullId": "concept:rl99efjs5sej75heqe5g", "name": "Market Garden", "type": "system", "description": "Intensive agriculture surrounding towers", "rung": 2, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "rmidueqebch3xoyzqv1z", "fullId": "concept:rmidueqebch3xoyzqv1z", "name": "Physical Planning", "type": "process", "description": "Land and building design", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "roxjb8wbr9jbuukesn3s", "fullId": "concept:roxjb8wbr9jbuukesn3s", "name": "Waste Management", "type": "system", "description": "Circular waste zero waste", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "s2m4m8rn9n4kzqp52yyn", "fullId": "concept:s2m4m8rn9n4kzqp52yyn", "name": "Intensive Market Garden", "type": "system", "description": "High-intensity agricultural method", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "skm1rv6pedqe5znll2dm", "fullId": "concept:skm1rv6pedqe5znll2dm", "name": "Stewardship", "type": "process", "description": "Shared responsibility for resources", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "spnqlrrqtdo4lfhaxzr9", "fullId": "concept:spnqlrrqtdo4lfhaxzr9", "name": "Active voice", "type": "idea", "description": "Rule requiring active rather than passive voice", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "t7lihvu2ye4gjaglala9", "fullId": "concept:t7lihvu2ye4gjaglala9", "name": "Eco-Housing", "type": "system", "description": "Sustainable housing integrated with agriculture", "rung": 3, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "tg82sc3m4af3tdu6efax", "fullId": "concept:tg82sc3m4af3tdu6efax", "name": "Systems Thinking", "type": "process", "description": "Economic cultural social integration", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "udon2ozm2y41l8qhpeo2", "fullId": "concept:udon2ozm2y41l8qhpeo2", "name": "Social Layer", "type": "layer", "description": "Community relationships culture", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ffffff", "val": 1}, {"id": "udzfojvj035q9vqh14da", "fullId": "concept:udzfojvj035q9vqh14da", "name": "Improved readability", "type": "idea", "description": "Benefit of using ASD-STE100", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#2ec4b6", "val": 1}, {"id": "ujddkmejcailxyip3qji", "fullId": "concept:ujddkmejcailxyip3qji", "name": "Water Management", "type": "system", "description": "Circular water systems", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "ulwhvllm40m8d6f6uo3j", "fullId": "concept:ulwhvllm40m8d6f6uo3j", "name": "Stakeholder Resonance Scoring", "type": "system", "description": "Measure emotional resonance", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#ff6b35", "val": 1}, {"id": "wpf0mwb0o8qg6zqsaw3l", "fullId": "concept:wpf0mwb0o8qg6zqsaw3l", "name": "Adaptive Management", "type": "process", "description": "Learning and adjustment", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "yaqityehnr0fb02k4ngq", "fullId": "concept:yaqityehnr0fb02k4ngq", "name": "Community Building", "type": "process", "description": "Events and rituals", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}, {"id": "yrei7bl12ftkrf7m87vn", "fullId": "concept:yrei7bl12ftkrf7m87vn", "name": "Cultural Integration", "type": "process", "description": "Cultural systems thinking", "rung": 0, "nars_frequency": 0.8, "nars_confidence": 0.7, "evidence_count": 1, "tags": [], "color": "#7b2cbf", "val": 1}],
+            links: []
+        };
+        
+        // State
+        let focusedNodeId = null;
+        let g3d = null;
+        let nodeDataMap = {};
+        
+        // Build node lookup
+        graphData.nodes.forEach(n => { nodeDataMap[n.id] = n; });
+        
+        // Colors
+        const typeColors = {"entity": "#00d4ff", "system": "#ff6b35", "process": "#7b2cbf", "idea": "#2ec4b6", "event": "#ffbe0b", "person": "#e71d36", "place": "#06d6a0", "attribute": "#9b5de5", "quantity": "#f15bb5", "quality": "#00bbf9", "relation": "#fee440", "concept": "#ffffff"};
+        const categoryColors = {"Causal": "#ff6b6b", "Structural": "#4ecdc4", "Temporal": "#ffe66d", "Epistemic": "#95e1d3", "Agentive": "#dfe6e9", "Experiential": "#fd79a8"};
+        
+        // Initialize 3D graph
+        const elem = document.getElementById('graph-container');
+        g3d = ForceGraph3D()(elem)
+            .graphData(graphData)
+            .backgroundColor('#0a0a0f')
+            .nodeAutoColorBy('type')
+            .nodeColor(node => typeColors[node.type] || '#ffffff')
+            .nodeVal(node => Math.max(2, Math.sqrt(node.evidence_count) * 3))
+            .nodeLabel(node => `${node.name} (${node.type})`)
+            .nodeResolution(16)
+            .linkWidth(link => Math.max(0.3, link.weight * 2))
+            .linkColor(link => categoryColors[link.verb_category] || '#666')
+            .linkOpacity(0.4)
+            .linkDirectionalArrowLength(4)
+            .linkDirectionalArrowRelPos(0.95)
+            .linkDirectionalParticles(2)
+            .linkDirectionalParticleSpeed(0.008)
+            .linkDirectionalParticleWidth(2)
+            .linkDirectionalParticleColor(link => categoryColors[link.verb_category] || '#666')
+            .onNodeClick(node => {
+                focusNode(node);
+            })
+            .onBackgroundClick(() => {
+                unfocusAll();
+            });
+        
+        // Add labels to nodes using sprite text
+        const sprite = new SpriteText('');
+        sprite.fontFace = 'Arial, sans-serif';
+        sprite.fontSize = 12;
+        sprite.textHeight = 8;
+        sprite.color = '#fff';
+        sprite.backgroundColor = 'rgba(0,0,0,0.6)';
+        
+        // Custom node rendering with labels
+        g3d.nodeThreeObject(node => {
+            const group = new THREE.Group();
+            
+            // Sphere
+            const geometry = new THREE.SphereGeometry(
+                Math.max(2, Math.sqrt(node.evidence_count) * 1.5), 
+                24, 24
+            );
+            const material = new THREE.MeshPhongMaterial({
+                color: typeColors[node.type] || '#ffffff',
+                transparent: true,
+                opacity: 0.9,
+                shininess: 80
+            });
+            const sphere = new THREE.Mesh(geometry, material);
+            group.add(sphere);
+            
+            // Glow for focused
+            if (node.id === focusedNodeId) {
+                const glowGeo = new THREE.SphereGeometry(
+                    Math.max(2, Math.sqrt(node.evidence_count) * 2.2), 
+                    24, 24
+                );
+                const glowMat = new THREE.MeshBasicMaterial({
+                    color: typeColors[node.type] || '#ffffff',
+                    transparent: true,
+                    opacity: 0.15
+                });
+                const glow = new THREE.Mesh(glowGeo, glowMat);
+                group.add(glow);
+            }
+            
+            // Label sprite
+            const labelCanvas = document.createElement('canvas');
+            const ctx = labelCanvas.getContext('2d');
+            labelCanvas.width = 256;
+            labelCanvas.height = 64;
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.roundRect(0, 0, 256, 64, 8);
+            ctx.fill();
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const name = node.name.length > 28 ? node.name.substring(0, 25) + '...' : node.name;
+            ctx.fillText(name, 128, 32);
+            
+            const texture = new THREE.CanvasTexture(labelCanvas);
+            const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const labelSprite = new THREE.Sprite(spriteMat);
+            labelSprite.scale.set(20, 5, 1);
+            labelSprite.position.y = Math.max(2, Math.sqrt(node.evidence_count) * 2.5);
+            group.add(labelSprite);
+            
+            return group;
+        });
+        
+        // Focus on node
+        function focusNode(node) {
+            focusedNodeId = node.id;
+            
+            // Update details panel
+            document.getElementById('node-details').classList.add('visible');
+            document.getElementById('detail-name').textContent = node.name;
+            document.getElementById('detail-type').textContent = node.type;
+            document.getElementById('detail-type').style.background = typeColors[node.type] || '#666';
+            document.getElementById('detail-type').style.color = '#000';
+            document.getElementById('detail-description').textContent = node.description || 'No description';
+            document.getElementById('detail-rung').textContent = 'R' + (node.rung || 0);
+            document.getElementById('detail-confidence').textContent = (node.nars_confidence || 0).toFixed(2);
+            document.getElementById('detail-evidence').textContent = node.evidence_count || 0;
+            document.getElementById('detail-frequency').textContent = (node.nars_frequency || 0).toFixed(2);
+            
+            // Animate camera to node
+            const distance = 80;
+            const cameraPosition = {
+                x: node.x + distance,
+                y: node.y + distance / 2,
+                z: node.z + distance
+            };
+            
+            g3d.cameraPosition(cameraPosition, node, 1500);
+            
+            // Dim unfocused nodes
+            g3d.nodeOpacity(node => {
+                if (!focusedNodeId) return 1;
+                if (node.id === focusedNodeId) return 1;
+                // Check if connected
+                const isConnected = graphData.links.some(l => 
+                    l.source.id === node.id || l.target.id === node.id ||
+                    l.source === node.id || l.target === node.id
+                );
+                return isConnected ? 0.8 : 0.15;
+            });
+            
+            // Highlight connected links
+            g3d.linkOpacity(link => {
+                if (!focusedNodeId) return 0.4;
+                if (link.source.id === focusedNodeId || link.target.id === focusedNodeId ||
+                    link.source === focusedNodeId || link.target === focusedNodeId) {
+                    return 0.9;
+                }
+                return 0.08;
+            });
+            
+            g3d.linkWidth(link => {
+                if (!focusedNodeId) return Math.max(0.3, link.weight * 2);
+                if (link.source.id === focusedNodeId || link.target.id === focusedNodeId ||
+                    link.source === focusedNodeId || link.target === focusedNodeId) {
+                    return Math.max(1, link.weight * 4);
+                }
+                return 0.3;
+            });
+        }
+        
+        function unfocusAll() {
+            focusedNodeId = null;
+            document.getElementById('node-details').classList.remove('visible');
+            
+            g3d.nodeOpacity(1);
+            g3d.linkOpacity(0.4);
+            g3d.linkWidth(link => Math.max(0.3, link.weight * 2));
+        }
+        
+        // Update stats
+        document.getElementById('node-count').textContent = graphData.nodes.length;
+        document.getElementById('link-count').textContent = graphData.links.length;
+        
+        // Controls
+        document.getElementById('reset-camera').addEventListener('click', () => {
+            unfocusAll();
+            g3d.zoomToFit(1000);
+        });
+        
+        // Size selector
+        document.getElementById('size-select').addEventListener('change', (e) => {
+            const mode = e.target.value;
+            g3d.nodeVal(node => {
+                if (mode === 'evidence') return Math.max(2, Math.sqrt(node.evidence_count) * 3);
+                if (mode === 'confidence') return Math.max(2, node.nars_confidence * 15);
+                return 5;
+            });
+        });
+        
+        // Keyboard controls for first-person fly
+        const camera = g3d.camera();
+        const velocity = { x: 0, y: 0, z: 0 };
+        const speed = 0.5;
+        const keys = {};
+        
+        document.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+        document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+        
+        function updateCamera() {
+            if (keys['w']) velocity.z -= speed;
+            if (keys['s']) velocity.z += speed;
+            if (keys['a']) velocity.x -= speed;
+            if (keys['d']) velocity.x += speed;
+            if (keys['q']) velocity.y -= speed;
+            if (keys['e']) velocity.y += speed;
+            
+            camera.position.x += velocity.x;
+            camera.position.y += velocity.y;
+            camera.position.z += velocity.z;
+            
+            velocity.x *= 0.9;
+            velocity.y *= 0.9;
+            velocity.z *= 0.9;
+            
+            requestAnimationFrame(updateCamera);
+        }
+        updateCamera();
+        
+        // Initial zoom to fit
+        setTimeout(() => {
+            g3d.zoomToFit(1500);
+        }, 1000);
+    </script>
+</body>
+</html>
