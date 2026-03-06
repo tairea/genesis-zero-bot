@@ -1,0 +1,35 @@
+# Ralph Config - Kiro Backend
+# Optimized for Kiro CLI
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 100
+  max_runtime_seconds: 14400
+  max_consecutive_failures: 5
+
+cli:
+  backend: "kiro"
+  prompt_mode: "arg"
+  pty_mode: false
+
+core:
+  specs_dir: "./specs/"
+  guardrails:
+    - "Fresh context each iteration - save learnings"
+    - "Verification mandatory"
+    - "YAGNI - no speculative features"
+    - "KISS - simplest solution"
+    - "Confidence protocol: score decisions 0-100"
+
+hats:
+  builder:
+    name: "Builder"
+    triggers: ["build.task"]
+    publishes: ["build.done", "build.blocked"]
+    instructions: |
+      ## BUILDER MODE
+      Implement, create files, run tests.
+      1. Read build.task
+      2. IMPLEMENT
+      3. VERIFY
+      4. Emit build.done or build.blocked

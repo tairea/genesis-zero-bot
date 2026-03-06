@@ -1,0 +1,17 @@
+# Hatless Baseline
+# Pattern: None (control)
+# No hats - tests core Ralph loop without delegation
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 20
+
+cli:
+  backend: "claude"
+  prompt_mode: "arg"
+
+core:
+  specs_dir: "./specs/"
+
+# NO HATS - Ralph works directly without delegation
+# This is intentional for baseline testing

@@ -1,0 +1,48 @@
+# TDD Red-Green-Refactor Workflow
+# Pattern: Critic-Actor Pipeline
+# Philosophy: Enforce red-green-refactor discipline through agent separation
+
+hats:
+  test_writer:
+    name: "🔴 Test Writer"
+    triggers: ["task.start", "refactor.done"]
+    publishes: ["test.written"]
+    instructions: |
+      ## TEST WRITER MODE
+      Write FAILING tests first. This is non-negotiable.
+
+      1. Read the spec/requirement
+      2. Write minimum test capturing the requirement
+      3. Verify test FAILS (red phase)
+      4. Publish test.written with test file path
+
+      NEVER write implementation. Your job is tests only.
+
+  implementer:
+    name: "🟢 Implementer"
+    triggers: ["test.written"]
+    publishes: ["test.passing"]
+    instructions: |
+      ## IMPLEMENTER MODE
+      Make failing test pass with MINIMAL code.
+
+      1. Read failing test
+      2. Write simplest code to make it pass
+      3. Run test to confirm green
+      4. Publish test.passing
+
+      Do NOT refactor. Do NOT add extra functionality.
+
+  refactorer:
+    name: "🔵 Refactorer"
+    triggers: ["test.passing"]
+    publishes: ["refactor.done", "cycle.complete"]
+    instructions: |
+      ## REFACTORER MODE
+      Clean up code while tests stay green.
+
+      1. Review implementation for code smells
+      2. Refactor for clarity, DRY, maintainability
+      3. Run tests to confirm still passing
+      4. If more tests needed: publish refactor.done
+      5. If feature complete: publish cycle.complete → LOOP_COMPLETE

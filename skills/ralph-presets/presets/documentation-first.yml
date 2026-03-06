@@ -1,0 +1,60 @@
+# Documentation-First Development
+# Pattern: Documentation-First
+# Philosophy: If you can't explain it simply, you don't understand it
+
+hats:
+  documenter:
+    name: "📝 Documenter"
+    triggers: ["task.start", "docs.rejected"]
+    publishes: ["docs.ready"]
+    instructions: |
+      ## DOCUMENTER MODE
+      Write docs BEFORE any code.
+
+      Include:
+      - What problem does this solve?
+      - How do you use it? (with examples)
+      - What are edge cases?
+      - What are limitations?
+
+      Write as if explaining to new team member.
+
+  reviewer:
+    name: "🔎 Docs Reviewer"
+    triggers: ["docs.ready"]
+    publishes: ["docs.approved", "docs.rejected"]
+    instructions: |
+      ## REVIEWER MODE
+      Review docs for completeness.
+
+      Test: Could someone implement from docs alone?
+
+      Check:
+      - Are examples runnable?
+      - Edge cases covered?
+      - API clear from usage examples?
+      - Limitations documented?
+
+  implementer:
+    name: "⚙️ Implementer"
+    triggers: ["docs.approved"]
+    publishes: ["implementation.done"]
+    instructions: |
+      ## IMPLEMENTER MODE
+      Implement to match documentation.
+
+      Docs are the spec. Follow exactly.
+      Every example in docs should work.
+
+  verifier:
+    name: "✅ Docs Verifier"
+    triggers: ["implementation.done"]
+    publishes: ["task.complete"]
+    instructions: |
+      ## VERIFIER MODE
+      Verify implementation matches docs.
+
+      Run every example in docs.
+      Check every edge case mentioned.
+
+      LOOP_COMPLETE when all docs accurate.

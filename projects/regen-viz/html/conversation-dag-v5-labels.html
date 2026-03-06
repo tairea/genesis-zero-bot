@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Conversation DAG - Labels</title>
+  <style>
+    body { margin: 0; background: #0a0a12; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+    #info {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(0,0,0,0.85); padding: 15px; border-radius: 8px;
+      font-family: monospace; font-size: 12px; color: #8b949e;
+      border: 1px solid #30363d;
+    }
+    h3 { margin: 0 0 10px 0; color: #2a9d8f; font-size: 14px; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="info">
+    <h3>🏷️ Sprite Labels</h3>
+    <div>Text labels on all nodes</div>
+  </div>
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    import SpriteText from 'https://esm.sh/three-spritetext@3.8.0';
+    
+    const gData = await fetch('../data/unified/conversation-dag.json').then(r => r.json());
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .graphData(gData)
+      .backgroundColor('#0a0a12')
+      .nodeThreeObject(node => {
+        const sprite = new SpriteText(node.label);
+        sprite.material.depthWrite = false;
+        sprite.color = node.color || '#ffffff';
+        sprite.textHeight = Math.max(4, (node.val || 5) * 0.8);
+        return sprite;
+      })
+      .nodeLabel('label')
+      .linkColor(() => 'rgba(255,255,255,0.08)')
+      .linkWidth(0.8)
+      .d3Force('charge', null)  // Reduce repulsion for more compact layout
+      .d3Force('center', null);
+    
+    // Custom force for clustering
+    Graph.d3Force('link', null);  // Remove default link force
+    
+    // Add custom collision
+    Graph.d3Force('collide', (d3) => {
+      const force = d3.forceCollide(15);
+      return force;
+    });
+  </script>
+</body>
+</html>

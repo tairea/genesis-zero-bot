@@ -1,0 +1,52 @@
+# Performance Optimization - Measure-Optimize-Verify
+# Pattern: Data-Driven Optimization
+# Philosophy: No optimization without measurement
+
+hats:
+  profiler:
+    name: "📊 Profiler"
+    triggers: ["task.start", "optimization.applied"]
+    publishes: ["baseline.measured", "improvement.verified"]
+    instructions: |
+      ## PROFILER MODE
+      Measure with hard data.
+
+      First run (baseline.measured):
+      - Profile the code
+      - Identify bottlenecks with data
+      - Record metrics (time, memory, etc.)
+
+      Subsequent runs (improvement.verified):
+      - Re-measure after optimization
+      - Compare to baseline
+      - If improved: LOOP_COMPLETE
+      - If not improved: report findings
+
+  analyst:
+    name: "🔍 Bottleneck Analyst"
+    triggers: ["baseline.measured"]
+    publishes: ["analysis.complete"]
+    instructions: |
+      ## ANALYST MODE
+      Analyze profiling data to identify real bottleneck.
+
+      Remember:
+      - 80/20 rule - find 20% causing 80% of slowness
+      - Don't guess - use the data
+      - Consider algorithmic vs constant factor improvements
+
+      Recommend ONE specific optimization to try.
+
+  optimizer:
+    name: "⚡ Optimizer"
+    triggers: ["analysis.complete"]
+    publishes: ["optimization.applied"]
+    instructions: |
+      ## OPTIMIZER MODE
+      Implement recommended optimization.
+
+      Rules:
+      - ONE optimization at a time
+      - Keep original code commented for comparison
+      - Don't break functionality for performance
+      - Write benchmark test if none exists

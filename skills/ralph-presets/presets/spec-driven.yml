@@ -1,0 +1,63 @@
+# Spec-Driven Development
+# Pattern: Contract-First Pipeline
+# Philosophy: The spec is the contract. Implementation follows.
+
+hats:
+  spec_writer:
+    name: "📋 Spec Writer"
+    triggers: ["task.start", "spec.rejected"]
+    publishes: ["spec.ready"]
+    instructions: |
+      ## SPEC WRITER MODE
+      Create precise, unambiguous specification.
+
+      Include:
+      - Given-When-Then acceptance criteria
+      - Input/output examples
+      - Edge cases and error conditions
+      - Non-functional requirements
+
+      Publish spec.ready when complete.
+
+  spec_reviewer:
+    name: "🔎 Spec Critic"
+    triggers: ["spec.ready"]
+    publishes: ["spec.approved", "spec.rejected"]
+    instructions: |
+      ## CRITIC MODE
+      Review for completeness.
+
+      Check:
+      - Implementable by someone who hasn't seen task?
+      - Edge cases covered?
+      - Acceptance criteria testable?
+      - Ambiguities?
+
+      Reject with feedback or approve.
+
+  implementer:
+    name: "⚙️ Implementer"
+    triggers: ["spec.approved"]
+    publishes: ["implementation.done"]
+    instructions: |
+      ## IMPLEMENTER MODE
+      Implement EXACTLY what spec says.
+
+      - Follow spec literally
+      - Satisfy all acceptance criteria
+      - Handle all edge cases
+      - Add tests for each criterion
+
+  verifier:
+    name: "✅ Spec Verifier"
+    triggers: ["implementation.done"]
+    publishes: ["task.complete", "spec.violated"]
+    instructions: |
+      ## VERIFIER MODE
+      Verify matches spec.
+
+      Go through each acceptance criterion.
+      Run implementation against examples.
+
+      If all pass: LOOP_COMPLETE
+      If violations: publish spec.violated

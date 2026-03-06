@@ -1,0 +1,38 @@
+# Regen Tribe Ralph Orchestrator Configuration
+# Multi-project workflow using Ralph presets
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 100
+  max_runtime_seconds: 14400
+
+cli:
+  backend: "claude"
+  prompt_mode: "arg"
+
+core:
+  specs_dir: "./specs/"
+  guardrails:
+    - "Fresh context each iteration - save learnings to memories"
+    - "Verification mandatory - tests/typecheck/lint must pass"
+    - "YAGNI - no speculative features"
+    - "KISS - simplest solution"
+    - "Confidence protocol: score decisions 0-100"
+
+# Import presets by running with:
+# ralph run -c ralph.yml -H presets/feature.yml -p "projects/tribes-platform/PROMPT.md"
+
+# Project presets reference:
+# - research:       ralph run -c ralph.yml -H presets/research.yml -p "projects/X/PROMPT.md"
+# - feature:       ralph run -c ralph.yml -H presets/feature.yml -p "projects/X/PROMPT.md"
+# - bugfix:        ralph run -c ralph.yml -H presets/bugfix.yml -p "projects/X/PROMPT.md"
+# - documentation:  ralph run -c ralph.yml -H presets/docs.yml -p "projects/X/PROMPT.md"
+# - spec-driven:   ralph run -c ralph.yml -H presets/spec-driven.yml -p "projects/X/PROMPT.md"
+# - debug:         ralph run -c ralph.yml -H presets/debug.yml -p "projects/X/PROMPT.md"
+# - fresh-eyes:    ralph run -c ralph.yml -H presets/fresh-eyes.yml -p "projects/X/PROMPT.md"
+# - code-assist:   ralph run -c ralph.yml -H presets/code-assist.yml -p "projects/X/PROMPT.md"
+# - pdd-to-code:   ralph run -c ralph.yml -H presets/pdd-to-code-assist.yml -p "projects/X/PROMPT.md"
+
+# Example usage:
+# cd ~/.openclaw/workspace-genesis/skills/ralph-presets
+# ralph run -c ralph.yml -H presets/research.yml -p "projects/tribes-platform/PROMPT.md"

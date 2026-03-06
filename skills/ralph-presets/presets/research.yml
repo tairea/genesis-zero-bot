@@ -1,0 +1,34 @@
+# Research Workflow
+# Pattern: Exploration
+# Deep exploration without code changes
+
+hats:
+  researcher:
+    name: "Researcher"
+    triggers: ["research.start", "research.followup"]
+    publishes: ["research.finding", "research.question"]
+    instructions: |
+      ## RESEARCHER MODE
+      Gather information, analyze patterns.
+
+      Process:
+      1. Scope the question
+      2. Search broadly (grep, find, read)
+      3. Document findings
+      4. Identify gaps
+
+      Output RESEARCH_COMPLETE when done.
+
+  synthesizer:
+    name: "Synthesizer"
+    triggers: ["research.finding"]
+    publishes: ["research.followup", "synthesis.complete"]
+    instructions: |
+      ## SYNTHESIZER MODE
+      Review and synthesize findings.
+
+      1. Read all findings
+      2. Identify patterns
+      3. Note contradictions
+      4. If gaps: research.followup
+      5. If complete: synthesis.complete

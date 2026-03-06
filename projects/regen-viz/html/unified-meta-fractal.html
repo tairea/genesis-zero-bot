@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Regen Tribe - Unified Semantic Graph</title>
+  <style>
+    body { margin: 0; background: #000000; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+    #legend {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(0,0,0,0.8); color: #fff;
+      padding: 15px; border-radius: 8px; font-family: monospace; font-size: 11px;
+      border: 1px solid #333;
+    }
+    .legend-title { font-weight: bold; margin-bottom: 8px; color: #58a6ff; }
+    .legend-item { display: flex; align-items: center; margin: 4px 0; }
+    .legend-color { width: 12px; height: 12px; border-radius: 2px; margin-right: 8px; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="legend">
+    <div class="legend-title">SEMANTIC TYPES</div>
+    <div class="legend-item"><div class="legend-color" style="background:#ffb703"></div>ArchiMate (AM) - Business</div>
+    <div class="legend-item"><div class="legend-color" style="background:#e85d04"></div>ArchiMate (AM) - Process</div>
+    <div class="legend-item"><div class="legend-color" style="background:#00b4d8"></div>LangExtract (LX) - Environmental</div>
+    <div class="legend-item"><div class="legend-color" style="background:#e94560"></div>LangExtract (LX) - Mental</div>
+    <div class="legend-item"><div class="legend-color" style="background:#f7d794"></div>LangExtract (LX) - Motivational</div>
+    <div class="legend-item"><div class="legend-color" style="background:#0096c7"></div>gist (GI) - Governance</div>
+    <div class="legend-item"><div class="legend-color" style="background:#2a9d8f"></div>RGEM (RG) - Resource</div>
+    <div class="legend-item"><div class="legend-color" style="background:#72efdd"></div>ArchiMate (AM) - Technology</div>
+  </div>
+  <script>
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .jsonUrl('../data/unified/meta-fractal-dao.json')
+      .nodeAutoColorBy('group')
+      .nodeLabel('label')
+      .linkColor(() => '#ffffff33')
+      .linkWidth(1)
+      .linkDirectionalArrowLength(3)
+      .linkDirectionalArrowRelPos(1)
+      .backgroundColor('#000000')
+      .nodeRelSize(6)
+      .onNodeClick(node => {
+        Graph.graphData().links.forEach(l => {
+          if (l.source.id === node.id || l.target.id === node.id) {
+            l.color = '#ff0000';
+            l.width = 3;
+          }
+        });
+        Graph.linkColor(l => l.color || '#ffffff33').linkWidth(l => l.width || 1);
+      });
+  </script>
+</body>
+</html>

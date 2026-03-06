@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Conversation DAG - Tesseract Projection</title>
+  <style>
+    body { margin: 0; background: #050510; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+    #info {
+      position: absolute; top: 20px; right: 20px;
+      background: rgba(0,0,0,0.9); padding: 20px; border-radius: 8px;
+      font-family: 'Courier New', monospace; font-size: 11px; color: #8b949e;
+      border: 1px solid #30363d; text-align: right;
+    }
+    h3 { margin: 0 0 12px 0; color: #7209b7; font-size: 14px; letter-spacing: 2px; }
+    .formula { color: #2a9d8f; margin: 8px 0; }
+    .legend { display: flex; gap: 12px; margin-top: 12px; justify-content: flex-end; }
+    .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="info">
+    <h3>⧠ TESSERACT</h3>
+    <div class="formula">x, y, z, w → projection</div>
+    <div class="formula">ana (↑) — toward w</div>
+    <div class="formula">kata (↓) — away from w</div>
+    <div style="margin-top:12px;font-size:10px;color:#666;">
+      4D hypercube projection
+    </div>
+    <div class="legend">
+      <div class="legend-item">Topic<div class="dot" style="background:#e63946"></div></div>
+      <div class="legend-item">Actor<div class="dot" style="background:#58a6ff"></div></div>
+      <div class="legend-item">Msg<div class="dot" style="background:#8b949e"></div></div>
+    </div>
+  </div>
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    
+    const gData = await fetch('../data/unified/conversation-dag.json').then(r => r.json());
+    
+    // Tesseract-style visualization with edge detection
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .graphData(gData)
+      .backgroundColor('#050510')
+      .nodeLabel('label')
+      .linkColor(() => 'rgba(114,9,183,0.4)')
+      .linkWidth(1.5)
+      .linkDirectionalArrowLength(3)
+      .linkDirectionalArrowRelPos(0.9)
+      .nodeRelSize(6)
+      // Tesseract-inspired node geometry
+      .nodeThreeObject(node => {
+        const size = (node.val || 5);
+        const group = new THREE.Group();
+        
+        // Inner cube (3D projection)
+        const innerSize = size * 0.5;
+        const innerGeo = new THREE.BoxGeometry(innerSize, innerSize, innerSize);
+        const innerMat = new THREE.MeshStandardMaterial({
+          color: node.color,
+          emissive: node.color,
+          emissiveIntensity: 0.6,
+          roughness: 0.2,
+          metalness: 0.9,
+          wireframe: false
+        });
+        const inner = new THREE.Mesh(innerGeo, innerMat);
+        group.add(inner);
+        
+        // Outer wireframe (4D→3D projection)
+        const outerGeo = new THREE.BoxGeometry(size, size, size);
+        const outerMat = new THREE.MeshBasicMaterial({
+          color: node.color,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.3
+        });
+        const outer = new THREE.Mesh(outerGeo, outerMat);
+        group.add(outer);
+        
+        // Edge enhancement - connecting vertices
+        const edgeGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(size * 1.1, size * 1.1, size * 1.1));
+        const edgeMat = new THREE.LineBasicMaterial({ 
+          color: node.color, 
+          transparent: true, 
+          opacity: 0.6 
+        });
+        const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+        group.add(edges);
+        
+        // Corner vertices (8 points of tesseract projection)
+        const corners = [
+          [-1,-1,-1], [1,-1,-1], [-1,1,-1], [1,1,-1],
+          [-1,-1,1], [1,-1,1], [-1,1,1], [1,1,1]
+        ];
+        corners.forEach(([x,y,z]) => {
+          const vGeo = new THREE.SphereGeometry(size * 0.1, 8, 8);
+          const vMat = new THREE.MeshBasicMaterial({ color: node.color });
+          const v = new THREE.Mesh(vGeo, vMat);
+          v.position.set(x * size * 0.6, y * size * 0.6, z * size * 0.6);
+          group.add(v);
+        });
+        
+        return group;
+      })
+      .nodeThreeObjectExtend(true);
+    
+    // Slow rotation for tesseract feel
+    Graph.cameraAutoRotate(true);
+    Graph.cameraAutoRotateSpeed(0.4);
+  </script>
+</body>
+</html>

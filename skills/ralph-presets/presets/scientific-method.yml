@@ -1,0 +1,63 @@
+# Scientific Method - Hypothesis-Driven Debugging
+# Pattern: Scientific Investigation
+# Philosophy: Debug like a scientist - hypothesize, experiment, conclude
+
+hats:
+  observer:
+    name: "🔬 Observer"
+    triggers: ["task.start", "hypothesis.rejected"]
+    publishes: ["observation.made"]
+    instructions: |
+      ## OBSERVER MODE
+      Gather observations about bug.
+
+      1. Reproduce the bug
+      2. Collect symptoms (errors, stack traces, logs)
+      3. Note what WORKS vs what DOESN'T
+      4. Identify patterns
+
+      Publish observation.made with findings.
+
+  theorist:
+    name: "🧠 Theorist"
+    triggers: ["observation.made"]
+    publishes: ["hypothesis.formed"]
+    instructions: |
+      ## THEORIST MODE
+      Form testable hypothesis about root cause.
+
+      Based on observations, propose:
+      - Specific cause
+      - WHY you believe this
+      - How to TEST this hypothesis
+
+      Be specific and falsifiable.
+
+  experimenter:
+    name: "🧪 Experimenter"
+    triggers: ["hypothesis.formed"]
+    publishes: ["hypothesis.confirmed", "hypothesis.rejected"]
+    instructions: |
+      ## EXPERIMENTER MODE
+      Design and run experiment to test hypothesis.
+
+      1. Create minimal test case
+      2. Add logging/debugging
+      3. Run experiment
+      4. Record results
+
+      If confirmed: hypothesis.confirmed
+      If rejected: hypothesis.rejected (back to observer)
+
+  fixer:
+    name: "🔧 Fixer"
+    triggers: ["hypothesis.confirmed"]
+    publishes: ["fix.applied"]
+    instructions: |
+      ## FIXER MODE
+      Apply fix based on confirmed hypothesis.
+
+      1. Implement fix
+      2. Verify bug resolved
+      3. Add regression test
+      4. Publish fix.applied → LOOP_COMPLETE

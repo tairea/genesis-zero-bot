@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Conversation DAG - 4D Edge Detection</title>
+  <style>
+    body { margin: 0; background: #000000; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+    #info {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(0,0,0,0.9); padding: 20px; border-radius: 8px;
+      font-family: 'Courier New', monospace; font-size: 11px; color: #8b949e;
+      border: 1px solid #30363d; max-width: 320px;
+    }
+    h3 { margin: 0 0 12px 0; color: #58a6ff; font-size: 14px; letter-spacing: 1px; }
+    .axis { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+    .axis-label { color: #e63946; font-weight: bold; }
+    .axis-w { color: #7209b7; }
+    .axis-t { color: #2a9d8f; }
+    .legend { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .edge {
+      position: absolute; bottom: 20px; left: 20px;
+      font-size: 10px; color: #666;
+    }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="info">
+    <h3>◇ 4D EDGE DETECTION ◇</h3>
+    <div class="axis"><span class="axis-label axis-w">w</span> — Fourth dimension (4D geometry)</div>
+    <div class="axis"><span class="axis-label axis-t">t</span> — Time axis (spacetime)</div>
+    <div class="axis"><span class="axis-label">x,y,z</span> — 3D space</div>
+    <div style="margin-top:12px;color:#58a6ff;">DIMENSIONAL EDGE DETECTION</div>
+    <div class="legend">
+      <div class="legend-item"><div class="dot" style="background:#e63946"></div>Topics (w)</div>
+      <div class="legend-item"><div class="dot" style="background:#58a6ff"></div>Actors (t)</div>
+      <div class="legend-item"><div class="dot" style="background:#8b949e"></div>Messages (xyz)</div>
+    </div>
+  </div>
+  <div class="edge">
+    ana ↑ / kata ↓  |  4D projection
+  </div>
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    
+    const gData = await fetch('../data/unified/conversation-dag.json').then(r => r.json());
+    
+    // Edge detection shader effect via post-processing
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .graphData(gData)
+      .backgroundColor('#000000')
+      .nodeLabel('label')
+      .linkColor(link => {
+        // Edge detection - brighter for stronger connections
+        if (link.type === 'authored') return 'rgba(88,166,255,0.6)';
+        if (link.type === 'in_topic') return 'rgba(230,57,70,0.5)';
+        return 'rgba(255,255,255,0.25)';
+      })
+      .linkWidth(link => {
+        // Edge detection - thicker for more important
+        if (link.type === 'authored') return 2.5;
+        if (link.type === 'in_topic') return 2;
+        return 1;
+      })
+      .nodeRelSize(6)
+      // Edge glow effect via emissive materials
+      .nodeThreeObject(node => {
+        const size = (node.val || 5) * 0.8;
+        
+        // Create glowing edge effect
+        const group = new THREE.Group();
+        
+        // Core sphere
+        const coreGeo = new THREE.SphereGeometry(size * 0.6, 16, 16);
+        const coreMat = new THREE.MeshStandardMaterial({
+          color: node.color,
+          emissive: node.color,
+          emissiveIntensity: 0.5,
+          roughness: 0.2,
+          metalness: 0.8
+        });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        group.add(core);
+        
+        // Edge glow (wireframe outer shell)
+        const glowGeo = new THREE.IcosahedronGeometry(size, 1);
+        const glowMat = new THREE.MeshBasicMaterial({
+          color: node.color,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.4
+        });
+        const glow = new THREE.Mesh(glowGeo, glowMat);
+        group.add(glow);
+        
+        // 4D tesseract-like outer shell (dodecahedron)
+        if (node.group === 'Topic') {
+          const outerGeo = new THREE.DodecahedronGeometry(size * 1.3, 0);
+          const outerMat = new THREE.MeshBasicMaterial({
+            color: 0xe63946,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.2
+          });
+          const outer = new THREE.Mesh(outerGeo, outerMat);
+          group.add(outer);
+        }
+        
+        return group;
+      })
+      // Pulsating edge detection
+      .nodeThreeObjectExtend(true);
+    
+    // Animate the edge glow (pulsing effect)
+    let time = 0;
+    Graph.onEngineStop(() => {
+      const animate = () => {
+        time += 0.02;
+        
+        // Pulse the wireframe opacity
+        Graph.graphData().nodes.forEach(node => {
+          if (node.__threeObj) {
+            node.__threeObj.children.forEach((child, i) => {
+              if (child.material && child.material.opacity !== undefined && i > 0) {
+                child.material.opacity = 0.2 + Math.sin(time + node.val) * 0.15;
+              }
+            });
+          }
+        });
+        
+        requestAnimationFrame(animate);
+      };
+      animate();
+    });
+    
+    // Camera auto-rotate for 4D projection feel
+    Graph.cameraAutoRotate(true);
+    Graph.cameraAutoRotateSpeed(0.3);
+  </script>
+</body>
+</html>

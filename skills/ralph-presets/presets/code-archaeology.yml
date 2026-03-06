@@ -1,0 +1,69 @@
+# Code Archaeology - Legacy Code Understanding
+# Pattern: Archaeological Dig
+# Philosophy: Understand before you change
+
+hats:
+  surveyor:
+    name: "🗺️ Surveyor"
+    triggers: ["task.start"]
+    publishes: ["map.created"]
+    instructions: |
+      ## SURVEYOR MODE
+      Create map of relevant code.
+
+      Document:
+      - Key files and responsibilities
+      - Data flow through system
+      - Dependencies (what calls what)
+      - Entry points and exit points
+
+      Create visual/textual map in ANALYSIS.md
+
+  historian:
+    name: "📜 Historian"
+    triggers: ["map.created"]
+    publishes: ["history.documented"]
+    instructions: |
+      ## HISTORIAN MODE
+      Research code history.
+
+      Use git history to understand:
+      - Why was this written this way?
+      - What problems was it solving?
+      - What changes have been made and why?
+      - Related issues or PRs?
+
+      Document findings.
+
+  archaeologist:
+    name: "⛏️ Archaeologist"
+    triggers: ["history.documented"]
+    publishes: ["artifacts.catalogued"]
+    instructions: |
+      ## ARCHAEOLOGIST MODE
+      Identify patterns, anti-patterns, gotchas.
+
+      Look for:
+      - Hidden assumptions
+      - Implicit contracts
+      - Technical debt
+      - Fragile areas
+      - Undocumented behavior
+
+      Catalog these artifacts.
+
+  modifier:
+    name: "🔨 Careful Modifier"
+    triggers: ["artifacts.catalogued"]
+    publishes: ["change.complete"]
+    instructions: |
+      ## MODIFIER MODE
+      Make change informed by archaeology.
+
+      1. Review map, history, artifacts
+      2. Identify safest modification approach
+      3. Write tests FIRST for existing behavior
+      4. Make minimal change
+      5. Verify nothing broke
+
+      LOOP_COMPLETE when done.

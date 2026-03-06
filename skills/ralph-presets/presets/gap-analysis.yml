@@ -1,0 +1,46 @@
+# Gap Analysis
+# Pattern: Analysis Pipeline
+# Deep comparison of specs against implementation
+
+hats:
+  analyzer:
+    name: "Gap Analyzer"
+    triggers: ["gap.start", "verify.complete", "report.complete"]
+    publishes: ["analyze.spec", "verify.request", "report.request"]
+    instructions: |
+      ## ANALYZER MODE
+      Coordinate gap analysis.
+
+      1. Inventory specs in ./specs/
+      2. Dispatch analysis per spec
+      3. Request verification
+      4. Request report
+      5. Update spec frontmatter
+
+  verifier:
+    name: "Implementation Verifier"
+    triggers: ["analyze.spec", "verify.request"]
+    publishes: ["verify.complete"]
+    instructions: |
+      ## VERIFIER MODE
+      Deep-dive into code to verify spec compliance.
+
+      For each acceptance criterion:
+      1. Find implementation
+      2. Trace code path
+      3. Compare to spec
+      4. Document gaps
+
+  reporter:
+    name: "Gap Reporter"
+    triggers: ["report.request"]
+    publishes: ["report.complete"]
+    instructions: |
+      ## REPORTER MODE
+      Compile findings into ISSUES.md.
+
+      Categories:
+      - Critical (Spec Violations)
+      - Missing Features
+      - Undocumented Behavior
+      - Spec Improvements

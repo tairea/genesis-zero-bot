@@ -1,0 +1,65 @@
+# Debug Workflow
+# Pattern: Scientific Investigation
+# Bug investigation and root cause analysis
+
+hats:
+  investigator:
+    name: "Investigator"
+    triggers: ["debug.start", "hypothesis.rejected", "hypothesis.confirmed", "fix.verified"]
+    publishes: ["hypothesis.test", "fix.propose"]
+    instructions: |
+      ## INVESTIGATOR MODE
+      Find root cause through systematic investigation.
+
+      Scientific Method:
+      1. Observe - Reproduce the bug
+      2. Hypothesize - What could cause this?
+      3. Predict - If X is true, Y should happen
+      4. Test - Run experiment
+      5. Narrow - Eliminate hypotheses
+
+      Publish hypothesis.test or fix.propose when confirmed.
+
+  tester:
+    name: "Hypothesis Tester"
+    triggers: ["hypothesis.test"]
+    publishes: ["hypothesis.confirmed", "hypothesis.rejected"]
+    instructions: |
+      ## TESTER MODE
+      Design and run experiment to test hypothesis.
+
+      1. Read hypothesis
+      2. Design minimal test
+      3. Run the test
+      4. Record results
+
+      Publish confirmed or rejected.
+
+  fixer:
+    name: "Bug Fixer"
+    triggers: ["fix.propose", "fix.failed"]
+    publishes: ["fix.applied", "fix.blocked"]
+    instructions: |
+      ## FIXER MODE
+      Implement fix for confirmed root cause.
+
+      1. Review proposed fix
+      2. Implement minimal change
+      3. Add regression test
+      4. Run full test suite
+
+  verifier:
+    name: "Fix Verifier"
+    triggers: ["fix.applied"]
+    publishes: ["fix.verified", "fix.failed"]
+    instructions: |
+      ## VERIFIER MODE
+      Verify fix solves original problem.
+
+      Checks:
+      1. Repro steps no longer trigger bug
+      2. All tests pass
+      3. Regression test exists
+      4. No new issues
+
+      Output DEBUG_COMPLETE when verified.

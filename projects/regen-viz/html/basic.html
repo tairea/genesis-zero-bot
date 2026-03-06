@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Regen Tribe - 3D Graph</title>
+  <style>
+    body { margin: 0; background: #000; }
+    #graph { width: 100vw; height: 100vh; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <script>
+    const DATA_URL = '../data/regen-tribe.json';
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+        .jsonUrl(DATA_URL)
+        .nodeAutoColorBy('group')
+        .nodeLabel('id')
+        .linkLabel('source')
+        .backgroundColor('#0d1117')
+        .nodeRelSize(6)
+        .linkDirectionalArrowLength(3.5)
+        .linkDirectionalArrowRelPos(1);
+  </script>
+</body>
+</html>

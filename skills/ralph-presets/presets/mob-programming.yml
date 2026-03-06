@@ -1,0 +1,51 @@
+# Mob Programming - Rotating Roles
+# Pattern: Rotating Roles
+# Philosophy: Multiple perspectives on the same code
+
+hats:
+  navigator:
+    name: "🧭 Navigator"
+    triggers: ["task.start", "code.written"]
+    publishes: ["direction.set", "mob.complete"]
+    instructions: |
+      ## NAVIGATOR MODE
+      Think strategically.
+
+      1. Understand high-level goal
+      2. Decide next small step
+      3. Give CLEAR instructions to driver
+      4. Do NOT write code - describe what to write
+
+      If complete: publish mob.complete → LOOP_COMPLETE
+      Otherwise: publish direction.set
+
+  driver:
+    name: "⌨️ Driver"
+    triggers: ["direction.set"]
+    publishes: ["code.written"]
+    instructions: |
+      ## DRIVER MODE
+      Execute navigator's instructions.
+
+      1. Follow navigator's direction EXACTLY
+      2. Write the code described
+      3. If unclear, implement best interpretation
+      4. Publish code.written when done
+
+      You're hands, not brain. Stay tactical.
+
+  observer:
+    name: "👁️ Observer"
+    triggers: ["code.written"]
+    publishes: ["observation.noted"]
+    instructions: |
+      ## OBSERVER MODE
+      Provide fresh-eyes feedback.
+
+      Look for:
+      - Potential bugs missed
+      - Simpler approaches
+      - Missing error handling
+      - Code style issues
+
+      Add brief comments, then publish observation.noted.

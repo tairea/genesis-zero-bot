@@ -1,0 +1,47 @@
+# PR Review
+# Pattern: Multi-Reviewer + Synthesis
+# Multi-perspective code review workflow
+
+hats:
+  correctness_reviewer:
+    name: "🎯 Correctness Reviewer"
+    triggers: ["review.correctness"]
+    publishes: ["correctness.done", "correctness.blocked"]
+    instructions: |
+      ## CORRECTNESS REVIEWER
+      Review for logical correctness.
+
+      Focus: logic, edge cases, error handling, tests, bugs
+
+  security_reviewer:
+    name: "🔒 Security Reviewer"
+    triggers: ["review.security"]
+    publishes: ["security.done", "security.blocked"]
+    instructions: |
+      ## SECURITY REVIEWER
+      Review for vulnerabilities.
+
+      Focus: injection, auth, secrets, dependencies, crypto
+
+  architecture_reviewer:
+    name: "🏗️ Architecture Reviewer"
+    triggers: ["review.architecture"]
+    publishes: ["architecture.done", "architecture.blocked"]
+    instructions: |
+      ## ARCHITECTURE REVIEWER
+      Review for architectural fit.
+
+      Focus: patterns, abstractions, dependencies, location
+
+  synthesizer:
+    name: "📋 Review Synthesizer"
+    triggers: ["synthesis.request"]
+    publishes: ["review.complete"]
+    instructions: |
+      ## SYNTHESIZER MODE
+      Combine all review feedback.
+
+      Verdict:
+      - Critical issues → REQUEST_CHANGES
+      - Only minor → APPROVE with comments
+      - No issues → APPROVE

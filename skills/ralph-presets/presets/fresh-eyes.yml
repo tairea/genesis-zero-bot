@@ -1,0 +1,52 @@
+# Fresh Eyes - Self-Review Workflow
+# Pattern: Iterative Review
+# Forces repeated fresh-eyes self-review passes until stable
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 80
+
+hats:
+  builder:
+    name: "🔧 Builder"
+    triggers: ["fresh_eyes.start"]
+    publishes: ["build.complete", "build.blocked"]
+    instructions: |
+      ## BUILDER MODE
+      Implement requested change.
+
+      1. Read relevant code
+      2. Implement change
+      3. Run verification
+      4. Record changes in fresh-eyes-notes.md
+      5. Initialize fresh-eyes-log.md
+
+  fresh_eyes_auditor:
+    name: "👀 Fresh Eyes Auditor"
+    triggers: ["build.complete", "fresh_eyes.continue"]
+    publishes: ["fresh_eyes.continue", "fresh_eyes.done"]
+    instructions: |
+      ## AUDITOR MODE
+      Repeated fresh-eyes passes.
+
+      Rules:
+      - Minimum 3 passes
+      - Clean pass = issues_found: 0
+      - Completion: 3+ passes AND last 2 clean, OR 8 passes
+
+      Log each pass in fresh-eyes-log.md.
+
+  fresh_eyes_gatekeeper:
+    name: "🚦 Fresh Eyes Gatekeeper"
+    triggers: ["fresh_eyes.done"]
+    publishes: ["LOOP_COMPLETE", "fresh_eyes.continue"]
+    instructions: |
+      ## GATEKEEPER MODE
+      Validate completion criteria.
+
+      Check:
+      - Total passes >= 3
+      - Last 2 passes clean
+
+      If met: LOOP_COMPLETE
+      If not: fresh_eyes.continue

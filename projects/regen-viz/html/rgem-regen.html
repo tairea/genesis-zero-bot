@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RGEM - Regen Neighborhood</title>
+  <style>
+    body { margin: 0; background: #0d1117; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+    #legend {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(0,0,0,0.85); color: #fff;
+      padding: 15px; border-radius: 8px; font-family: monospace; font-size: 11px;
+      border: 1px solid #30363d; max-width: 200px;
+    }
+    .legend-title { font-weight: bold; margin-bottom: 8px; color: #58a6ff; }
+    .legend-item { display: flex; align-items: center; margin: 4px 0; }
+    .legend-color { width: 12px; height: 12px; border-radius: 2px; margin-right: 8px; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="legend">
+    <div class="legend-title">RGEM QUINT</div>
+    <div class="legend-item"><div class="legend-color" style="background:#e9c46a"></div>7ST - Subject Types</div>
+    <div class="legend-item"><div class="legend-color" style="background:#2a9d8f"></div>7RT - Relation Types</div>
+    <div class="legend-item"><div class="legend-color" style="background:#caf0f8"></div>7ALS - Lifecycle</div>
+    <div class="legend-item"><div class="legend-color" style="background:#4cc9f0"></div>7ASR - Stakeholders</div>
+    <div class="legend-item"><div class="legend-color" style="background:#ff6700"></div>5UBT - Base Types</div>
+  </div>
+  <script>
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .jsonUrl('../data/unified/rgem-regen.json')
+      .nodeAutoColorBy('group')
+      .nodeLabel('label')
+      .linkColor(() => '#ffffff44')
+      .linkWidth(1.5)
+      .linkDirectionalArrowLength(4)
+      .linkDirectionalArrowRelPos(0.95)
+      .backgroundColor('#0d1117')
+      .nodeRelSize(6)
+      .onNodeClick(node => {
+        Graph.cameraPosition({ x: node.x * 1.5, y: node.y * 1.5, z: node.z * 1.5 }, node);
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Ralph Config - Claude Backend
+# Minimal configuration optimized for Claude Code CLI
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 100
+  max_runtime_seconds: 14400
+  idle_timeout_secs: 1800
+
+cli:
+  backend: "claude"
+  prompt_mode: "arg"
+
+core:
+  specs_dir: "./specs/"
+  guardrails:
+    - "Fresh context each iteration - save learnings to memories"
+    - "Verification mandatory - tests/typecheck/lint must pass"
+    - "YAGNI - no speculative features"
+    - "KISS - simplest solution"
+    - "Confidence protocol: score decisions 0-100"

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Regen Tribe - Tree View</title>
+  <style>
+    body { margin: 0; background: #0d1117; }
+    #graph { width: 100vw; height: 100vh; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <script>
+    const DATA_URL = '../data/regen-tribe.json';
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+        .jsonUrl(DATA_URL)
+        .nodeAutoColorBy('group')
+        .nodeThreeObject(node => {
+          const sprite = new SpriteText(node.id);
+          sprite.material.depthWrite = false;
+          sprite.color = node.color;
+          sprite.textHeight = 8;
+          return sprite;
+        })
+        .nodeThreeObjectExtend(['val'])
+        .graphData({});
+        
+    // Load data and convert to tree
+    fetch(DATA_URL).then(r => r.json()).then(data => {
+      // Simple tree conversion - main hub and spokes
+      const gData = { nodes: data.nodes, links: data.links };
+      Graph.graphData(gData);
+    });
+    
+    // Import SpriteText
+    const script = document.createElement('script');
+    script.src = 'https://esm.sh/three-spritetext';
+    document.head.appendChild(script);
+  </script>
+</body>
+</html>

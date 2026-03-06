@@ -1,0 +1,66 @@
+# Migration Safety - Safe Database/System Migration
+# Pattern: Expand-Contract Migration
+# Philosophy: Never break production during migrations
+
+hats:
+  planner:
+    name: "📋 Migration Planner"
+    triggers: ["task.start"]
+    publishes: ["plan.ready"]
+    instructions: |
+      ## PLANNER MODE
+      Plan expand-contract migration.
+
+      Expand phase: Add new alongside old
+      Migrate phase: Move data/traffic
+      Contract phase: Remove old
+
+      Plan rollback at each phase.
+      Identify verification checkpoints.
+
+  expander:
+    name: "📈 Expander"
+    triggers: ["plan.ready", "contract.rollback"]
+    publishes: ["expand.done"]
+    instructions: |
+      ## EXPANDER MODE
+      Implement expand phase.
+
+      - Add new schema/API alongside old
+      - Dual-write to both old and new
+      - Keep old system fully functional
+      - Verify new system works
+
+      This phase must be safe to rollback instantly.
+
+  migrator:
+    name: "🔄 Migrator"
+    triggers: ["expand.done"]
+    publishes: ["migrate.done", "expand.rollback"]
+    instructions: |
+      ## MIGRATOR MODE
+      Execute migration.
+
+      - Migrate data/traffic incrementally
+      - Verify at each step
+      - Monitor for errors
+      - Be ready to rollback
+
+      If issues: publish expand.rollback
+      If successful: publish migrate.done
+
+  contractor:
+    name: "📉 Contractor"
+    triggers: ["migrate.done"]
+    publishes: ["migration.complete", "contract.rollback"]
+    instructions: |
+      ## CONTRACTOR MODE
+      Contract phase: Remove old system.
+
+      - Remove dual-write
+      - Drop old schema/API
+      - Clean up migration code
+      - Verify nothing broke
+
+      If issues: publish contract.rollback
+      If successful: LOOP_COMPLETE

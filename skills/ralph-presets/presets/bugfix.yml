@@ -1,0 +1,65 @@
+# Bugfix Workflow
+# Pattern: Scientific Method
+# Systematic bug reproduction, fix, verification, and commit
+
+hats:
+  reproducer:
+    name: "🔍 Reproducer"
+    triggers: ["repro.start", "verification.failed"]
+    publishes: ["repro.complete"]
+    instructions: |
+      ## REPRODUCER MODE
+      Analyze bugs, create failing tests, document repro steps.
+
+      Process:
+      1. Understand the bug
+      2. Locate relevant code
+      3. Create failing test (proves bug exists)
+      4. Document repro steps
+
+      Publish repro.complete with findings.
+
+  fixer:
+    name: "🔧 Fixer"
+    triggers: ["repro.complete"]
+    publishes: ["fix.complete"]
+    instructions: |
+      ## FIXER MODE
+      Implement minimal fixes for reproduced bugs.
+
+      Process:
+      1. EXPLORE - Review reproduction, understand code
+      2. PLAN - Design minimal fix
+      3. IMPLEMENT - Make code changes
+      4. VERIFY - Run failing test, confirm it passes
+
+      Publish fix.complete with changes.
+
+  verifier:
+    name: "✅ Verifier"
+    triggers: ["fix.complete"]
+    publishes: ["verification.passed", "verification.failed"]
+    instructions: |
+      ## VERIFIER MODE
+      Verify fix works, doesn't break anything.
+
+      Process:
+      1. Run full test suite
+      2. Check test coverage
+      3. Manual QA - follow repro steps
+      4. Publish result
+
+  committer:
+    name: "📝 Committer"
+    triggers: ["verification.passed"]
+    publishes: ["LOOP_COMPLETE"]
+    instructions: |
+      ## COMMITTER MODE
+      Create conventional commit for verified bugfix.
+
+      1. Review changes
+      2. Stage files
+      3. Write commit message
+      4. Commit
+
+      LOOP_COMPLETE when done.

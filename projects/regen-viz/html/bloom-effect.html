@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Regen Tribe - Bloom Effect</title>
+  <style>
+    body { margin: 0; background: #000; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+  <script src="https://unpkg.com/postprocessing@6.29.2/build/postprocessing.js"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    
+    const DATA_URL = '../data/regen-tribe.json';
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+        .jsonUrl(DATA_URL)
+        .nodeAutoColorBy('group')
+        .nodeThreeObject(node => {
+          const img = new THREE.Mesh(
+            new THREE.SphereGeometry(node.val ? node.val/3 : 5),
+            new THREE.MeshStandardMaterial({ 
+              color: node.color || '#f00',
+              roughness: 0.3,
+              metalness: 0.8
+            })
+          );
+          return img;
+        })
+        .linkWidth(1)
+        .backgroundColor('#000');
+    
+    // Post-processing bloom effect
+    Graph
+      .postProcessingComposer()
+      .addPass(new THREE.BloomEffect({
+        bloomStrength: 1.5,
+        bloomRadius: 0.4,
+        bloomThreshold: 0.1
+      }));
+  </script>
+</body>
+</html>

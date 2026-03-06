@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Conversation DAG - Minimal</title>
+  <style>
+    body { margin: 0; background: #000000; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+    #title {
+      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+      color: #666; font-family: monospace; font-size: 12px; letter-spacing: 3px;
+    }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="title">REGEN TRIBE — CONVERSATION HISTORY</div>
+  <script>
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .jsonUrl('../data/unified/conversation-dag.json')
+      .nodeAutoColorBy('group')
+      .nodeLabel('label')
+      .linkColor(() => '#222222')
+      .linkWidth(0.5)
+      .backgroundColor('#000000')
+      .nodeRelSize(5)
+      .nodeOpacity(0.8)
+      .linkOpacity(0.3)
+      .onNodeClick(node => {
+        // Pulse effect
+        const original = node.val;
+        node.val = original * 2;
+        Graph.nodeRelSize(n => n.id === node.id ? n.val * 2 : 5);
+        setTimeout(() => {
+          node.val = original;
+          Graph.nodeRelSize(5);
+        }, 500);
+      });
+  </script>
+</body>
+</html>

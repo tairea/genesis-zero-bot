@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Regen Tribe - Responsive</title>
+  <style>
+    body { margin: 0; background: #0d1117; }
+    #graph { width: 100vw; height: 100vh; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <script>
+    const DATA_URL = '../data/regen-tribe.json';
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+        .jsonUrl(DATA_URL)
+        .nodeAutoColorBy('group')
+        .backgroundColor('#0d1117')
+        .responsive(true);
+    
+    window.addEventListener('resize', () => {
+      Graph
+        .width(window.innerWidth)
+        .height(window.innerHeight);
+    });
+  </script>
+</body>
+</html>

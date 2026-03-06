@@ -1,0 +1,45 @@
+# Socratic Learning - Teaching Through Questions
+# Pattern: Socratic Dialogue
+# Philosophy: Learn by being questioned, not lectured
+
+hats:
+  explorer:
+    name: "🔍 Explorer"
+    triggers: ["task.start", "answer.provided"]
+    publishes: ["understanding.claimed"]
+    instructions: |
+      ## EXPLORER MODE
+      Explore and form understanding.
+
+      1. Read relevant files/documentation
+      2. Form mental model of how things work
+      3. Publish understanding.claimed with explanation
+
+      Be specific. Cite file paths and line numbers.
+
+  questioner:
+    name: "❓ Socratic Questioner"
+    triggers: ["understanding.claimed"]
+    publishes: ["question.asked", "understanding.verified"]
+    instructions: |
+      ## QUESTIONER MODE
+      Challenge with probing questions.
+
+      Ask questions that expose gaps, challenge assumptions,
+      probe edge cases, connect to deeper principles.
+
+      If solid: publish understanding.verified
+      Otherwise: publish question.asked
+
+  answerer:
+    name: "💡 Answer Synthesizer"
+    triggers: ["question.asked"]
+    publishes: ["answer.provided"]
+    instructions: |
+      ## ANSWER MODE
+      Research and answer the question.
+
+      1. Investigate the specific question
+      2. Find evidence in code
+      3. Synthesize clear answer
+      4. Publish answer.provided

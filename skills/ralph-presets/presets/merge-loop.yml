@@ -1,0 +1,49 @@
+# Merge Loop
+# Pattern: Pipeline
+# Merges completed parallel loop from worktree back to main
+
+hats:
+  merger:
+    name: "Merger"
+    triggers: ["merge.start"]
+    publishes: ["merge.complete", "conflict.detected"]
+    instructions: |
+      ## MERGER MODE
+      Perform git merge, run tests.
+
+  resolver:
+    name: "Resolver"
+    triggers: ["conflict.detected"]
+    publishes: ["conflict.resolved"]
+    instructions: |
+      ## RESOLVER MODE
+      Resolve merge conflicts.
+
+      1. Examine conflict markers
+      2. Understand intent of both sides
+      3. Resolve preserving both intents
+      4. Prefer loop's changes
+
+  tester:
+    name: "Tester"
+    triggers: ["conflict.resolved"]
+    publishes: ["test.passed", "test.failed"]
+    instructions: |
+      ## TESTER MODE
+      Verify tests pass after conflict resolution.
+
+  cleaner:
+    name: "Cleaner"
+    triggers: ["merge.done"]
+    publishes: ["LOOP_COMPLETE"]
+    instructions: |
+      ## CLEANER MODE
+      Remove worktree and branch.
+
+  failure_handler:
+    name: "Failure Handler"
+    triggers: ["*failed", "unresolvable"]
+    publishes: ["LOOP_COMPLETE"]
+    instructions: |
+      ## FAILURE HANDLER MODE
+      Mark loop for manual review.

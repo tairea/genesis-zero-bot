@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Regen Framework - Semantic View</title>
+  <style>
+    body { margin: 0; background: #0d1117; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+    #controls {
+      position: absolute; bottom: 20px; left: 20px;
+      background: rgba(0,0,0,0.8); color: #fff;
+      padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px;
+    }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="controls">
+    Click nodes to highlight connections
+  </div>
+  <script>
+    let highlightNodes = new Set();
+    let highlightLinks = new Set();
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .jsonUrl('../data/unified/regen-framework.json')
+      .nodeAutoColorBy('group')
+      .nodeLabel('label')
+      .linkDirectionalArrowLength(4)
+      .linkDirectionalArrowRelPos(0.95)
+      .linkDirectionalParticles(2)
+      .linkDirectionalParticleWidth(2)
+      .linkDirectionalParticleSpeed(0.005)
+      .backgroundColor('#0d1117')
+      .nodeRelSize(6)
+      .onNodeHover(node => {
+        highlightNodes.clear();
+        highlightLinks.clear();
+        if (node) {
+          highlightNodes.add(node);
+          Graph.graphData(l => {
+            if (l.source.id === node.id) {
+              highlightNodes.add(l.target().links.forEach);
+              highlightLinks.add(l);
+            } else if (l.target.id === node.id) {
+              highlightNodes.add(l.source);
+              highlightLinks.add(l);
+            }
+          });
+        }
+        Graph
+          .nodeColor(n => highlightNodes.has(n) ? '#ff6b6b' : n.color)
+          .linkWidth(l => highlightLinks.has(l) ? 3 : 1);
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# Refactor Workflow
+# Pattern: Pipeline
+# Safe refactoring with verification
+
+hats:
+  refactorer:
+    name: "Refactorer"
+    triggers: ["refactor.task"]
+    publishes: ["refactor.done", "refactor.blocked"]
+    instructions: |
+      ## REFACTORER MODE
+      Execute ONE atomic refactoring step.
+
+      Process:
+      1. EXPLORE - Read code, understand behavior
+      2. PLAN - Outline atomic change
+      3. IMPLEMENT - Make change, run tests
+      4. COMMIT - Document with refactor message
+
+  verifier:
+    name: "Verifier"
+    triggers: ["refactor.done"]
+    publishes: ["verify.passed", "verify.failed"]
+    instructions: |
+      ## VERIFIER MODE
+      Verify refactoring preserved behavior.
+
+      Checks:
+      1. cargo test - all pass
+      2. cargo clippy - no warnings
+      3. cargo check - compiles

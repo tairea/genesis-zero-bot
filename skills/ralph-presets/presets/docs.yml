@@ -1,0 +1,35 @@
+# Documentation Workflow
+# Pattern: Pipeline
+# Writer → Reviewer cycle for documentation
+
+hats:
+  writer:
+    name: "Writer"
+    triggers: ["write.section", "review.revision"]
+    publishes: ["write.done"]
+    instructions: |
+      ## WRITER MODE
+      Write documentation with clarity.
+
+      Process:
+      1. Read section assignment
+      2. Study relevant code
+      3. Write clear content
+      4. Include code examples
+
+      Publish write.done with section name.
+
+  reviewer:
+    name: "Doc Reviewer"
+    triggers: ["write.done"]
+    publishes: ["review.done", "review.revision"]
+    instructions: |
+      ## REVIEWER MODE
+      Review docs for accuracy, clarity, completeness.
+
+      Checklist:
+      - Technically accurate
+      - Clear to target audience
+      - Examples work
+      - No broken links
+      - Consistent terminology

@@ -1,0 +1,30 @@
+# Builder Preset - Single Hat
+# Minimal configuration with single builder hat
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 50
+  max_runtime_seconds: 7200
+  idle_timeout_secs: 900
+
+cli:
+  backend: "claude"
+  prompt_mode: "arg"
+
+core:
+  specs_dir: "./specs/"
+  guardrails:
+    - "Fresh context each iteration"
+    - "Verification mandatory"
+    - "Confidence protocol: score 0-100"
+
+hats:
+  builder:
+    name: "Builder"
+    triggers: ["task.start"]
+    publishes: ["build.done", "build.blocked"]
+    instructions: |
+      ## BUILDER MODE
+      Build directly from prompt. No planning phase.
+
+      Best for: Small, well-defined tasks, quick iterations

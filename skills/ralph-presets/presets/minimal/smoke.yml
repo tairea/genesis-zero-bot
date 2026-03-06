@@ -1,0 +1,21 @@
+# Smoke Test Configuration
+# Uses Haiku for faster/cheaper testing
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 10
+  max_runtime_seconds: 300
+  idle_timeout_secs: 60
+
+cli:
+  backend: "custom"
+  command: "claude"
+  args: ["--dangerously-skip-permissions", "--model", "haiku"]
+  prompt_mode: "arg"
+  prompt_flag: "-p"
+
+core:
+  specs_dir: "./specs/"
+  guardrails:
+    - "Fresh context each iteration"
+    - "Confidence protocol"

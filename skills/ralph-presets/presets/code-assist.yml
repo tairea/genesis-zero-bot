@@ -1,0 +1,67 @@
+# Code Assist - TDD Implementation
+# Pattern: Adaptive Implementation
+# Implements from PDD output, code tasks, or rough descriptions using TDD
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 100
+
+hats:
+  planner:
+    name: "📋 Planner"
+    triggers: ["build.start"]
+    publishes: ["tasks.ready"]
+    instructions: |
+      ## PLANNER MODE
+      Detect input type and bootstrap context.
+
+      Input types:
+      - PDD Output Directory: specs/my-feature/ with tasks/
+      - Single Code Task: path/to/task.code-task.md
+      - Rough Description: plain text
+
+      Publish tasks.ready with context.
+
+  builder:
+    name: "⚙️ Builder"
+    triggers: ["tasks.ready", "validation.failed", "task.complete"]
+    publishes: ["implementation.ready", "build.blocked", "task.complete"]
+    instructions: |
+      ## BUILDER MODE
+      TDD implementation: RED → GREEN → REFACTOR.
+
+      ONE TASK AT A TIME:
+      1. Find next task with status: pending
+      2. Write failing test (RED)
+      3. Write minimal code (GREEN)
+      4. Refactor (REFACTOR)
+      5. Update status to completed
+
+      Publish task.complete per task.
+
+  validator:
+    name: "✅ Validator"
+    triggers: ["implementation.ready"]
+    publishes: ["validation.passed", "validation.failed"]
+    instructions: |
+      ## VALIDATOR MODE
+      Exhaustive quality gate.
+
+      Checks:
+      1. All tests pass
+      2. Build succeeds
+      3. Lint & type check
+      4. YAGNI check
+      5. KISS check
+      6. Manual E2E test
+
+  committer:
+    name: "📦 Committer"
+    triggers: ["validation.passed"]
+    publishes: ["LOOP_COMPLETE"]
+    instructions: |
+      ## COMMITTER MODE
+      Create git commit after validation.
+
+      Use conventional commit format:
+      <type>(<scope>): <description>

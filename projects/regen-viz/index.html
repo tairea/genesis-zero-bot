@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regen Viz — 3D Force Graph</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+      color: #e6edf3;
+      min-height: 100vh;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #58a6ff, #3fb950);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      color: #8b949e;
+      margin-bottom: 40px;
+    }
+    .section { margin-bottom: 40px; }
+    .section h2 {
+      color: #58a6ff;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 24px;
+      transition: transform 0.2s, border-color 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #58a6ff;
+    }
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: #58a6ff;
+    }
+    .card p {
+      color: #8b949e;
+      font-size: 0.85rem;
+    }
+    .badge {
+      display: inline-block;
+      background: #238636;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      margin-top: 10px;
+    }
+    .badge.semantic { background: #6e40c9; }
+    .badge.framework { background: #1f6feb; }
+  </style>
+</head>
+<body>
+  <h1>🌐 Regen Viz</h1>
+  <p class="subtitle">Interactive 3D network visualizations for Regen Tribe frameworks</p>
+  
+  <div class="section">
+    <h2>Unified Semantic Graphs</h2>
+    <div class="grid">
+      <a href="html/unified-meta-fractal.html" class="card">
+        <h3>Meta-Fractal DAO</h3>
+        <p>Full semantic graph showing all 4 frameworks (LangExtract, RGEM, gist, ArchiMate)</p>
+        <span class="badge semantic">Unified</span>
+      </a>
+      
+      <a href="html/unified-regen-framework.html" class="card">
+        <h3>Regen Framework</h3>
+        <p>5-category framework: Ecology, Hardware, Human Systems, Economy, Software</p>
+        <span class="badge framework">Framework</span>
+      </a>
+      
+      <a href="html/unified-bloom.html" class="card">
+        <h3>Bloom Effect</h3>
+        <p>Meta-Fractal DAO with post-processing bloom glow</p>
+        <span class="badge semantic">Visual</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>RGEM Visualizations</h2>
+    <div class="grid">
+      <a href="html/rgem-regen.html" class="card">
+        <h3>RGEM Quint</h3>
+        <p>Regen Neighborhood mapped to RGEM: 7ST, 7RT, 7ALS, 7ASR, 5UBT</p>
+        <span class="badge" style="background:#6e40c9">RGEM</span>
+      </a>
+      
+      <a href="html/rgem-interactive.html" class="card">
+        <h3>RGEM Interactive</h3>
+        <p>Search/filter nodes, click for details</p>
+        <span class="badge" style="background:#6e40c9">Interactive</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Tree of Civilization</h2>
+    <div class="grid">
+      <a href="html/tree-of-civilization.html" class="card">
+        <h3>🌳 Full View</h3>
+        <p>5-layer cosmic tree: Crown → Leaves → Branches → Trunk → Roots</p>
+        <span class="badge" style="background:#238636">Archetype</span>
+      </a>
+      
+      <a href="html/tree-minimal.html" class="card">
+        <h3>🌳 Minimal</h3>
+        <p>Minimalist dark theme version</p>
+        <span class="badge" style="background:#333">Minimal</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Framework Variants</h2>
+    <div class="grid">
+      <a href="html/regen-radial.html" class="card">
+        <h3>Radial</h3>
+        <p>3D shapes with particles</p>
+        <span class="badge framework">Variant</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Conversation DAG</h2>
+    <div class="grid">
+      <a href="html/conversation-dag.html" class="card">
+        <h3>🗣️ Full View</h3>
+        <p>2824 messages, 139 participants — click to highlight</p>
+        <span class="badge" style="background:#e63946">Original</span>
+      </a>
+      
+      <a href="html/conversation-dag-v2-tree.html" class="card">
+        <h3>🌳 Tree Layout</h3>
+        <p>Hierarchical DAG layout — top-down</p>
+        <span class="badge" style="background:#2a9d8f">Layout</span>
+      </a>
+      
+      <a href="html/conversation-dag-v3-highlight.html" class="card">
+        <h3>🔍 Highlight</h3>
+        <p>Hover to illuminate neighbors and links</p>
+        <span class="badge" style="background:#f4a261">Interactive</span>
+      </a>
+      
+      <a href="html/conversation-dag-v4-geometry.html" class="card">
+        <h3>💎 Geometry</h3>
+        <p>Custom 3D shapes: Icosahedron, Box, Sphere</p>
+        <span class="badge" style="background:#6e40c9">3D</span>
+      </a>
+      
+      <a href="html/conversation-dag-v5-labels.html" class="card">
+        <h3>🏷️ Labels</h3>
+        <p>SpriteText labels on all nodes</p>
+        <span class="badge" style="background:#58a6ff">Labels</span>
+      </a>
+      
+      <a href="html/conversation-dag-v6-particles.html" class="card">
+        <h3>✨ Particles</h3>
+        <p>Animated particle flow along links</p>
+        <span class="badge" style="background:#7209b7">Animation</span>
+      </a>
+      
+      <a href="html/conversation-minimal.html" class="card">
+        <h3>⚫ Minimal</h3>
+        <p>Minimal dark theme</p>
+        <span class="badge" style="background:#333">Minimal</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Basic Visualizations</h2>
+    <div class="grid">
+      <a href="html/basic.html" class="card">
+        <h3>Basic</h3>
+        <p>Simple 3D graph with auto-color</p>
+        <span class="badge">3D</span>
+      </a>
+      
+      <a href="html/highlight.html" class="card">
+        <h3>Highlight</h3>
+        <p>Interactive hover highlighting</p>
+        <span class="badge">Interactive</span>
+      </a>
+      
+      <a href="html/tree.html" class="card">
+        <h3>Tree</h3>
+        <p>Tree structure with labels</p>
+        <span class="badge">Labels</span>
+      </a>
+      
+      <a href="html/curved-links.html" class="card">
+        <h3>Curved Links</h3>
+        <p>Curved edge rendering</p>
+        <span class="badge">Style</span>
+      </a>
+      
+      <a href="html/directional-links.html" class="card">
+        <h3>Directional</h3>
+        <p>Animated arrows + particles</p>
+        <span class="badge">Animation</span>
+      </a>
+      
+      <a href="html/bloom-effect.html" class="card">
+        <h3>Bloom</h3>
+        <p>Post-processing glow effect</p>
+        <span class="badge">Effect</span>
+      </a>
+      
+      <a href="html/camera-orbit.html" class="card">
+        <h3>Camera Orbit</h3>
+        <p>Auto-rotating camera</p>
+        <span class="badge">Camera</span>
+      </a>
+      
+      <a href="html/controls-orbit.html" class="card">
+        <h3>Orbit Controls</h3>
+        <p>Click-drag rotation</p>
+        <span class="badge">Controls</span>
+      </a>
+      
+      <a href="html/controls-fly.html" class="card">
+        <h3>Fly Controls</h3>
+        <p>WASD navigation</p>
+        <span class="badge">Navigation</span>
+      </a>
+      
+      <a href="html/responsive.html" class="card">
+        <h3>Responsive</h3>
+        <p>Auto-resize on window</p>
+        <span class="badge">Responsive</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

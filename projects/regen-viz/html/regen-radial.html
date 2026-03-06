@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Regen Framework - Radial</title>
+  <style>
+    body { margin: 0; background: #0d1117; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+    #controls {
+      position: absolute; bottom: 20px; right: 20px;
+      background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px;
+      font-family: monospace; font-size: 11px;
+    }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="controls">
+    <button onclick="resetView()">Reset View</button>
+  </div>
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .jsonUrl('../data/unified/regen-framework.json')
+      .nodeAutoColorBy('group')
+      .nodeLabel('label')
+      .linkColor(() => '#ffffff22')
+      .linkWidth(2)
+      .linkDirectionalArrowLength(4)
+      .linkDirectionalArrowRelPos(0.9)
+      .backgroundColor('#0d1117')
+      .nodeRelSize(7)
+      .nodeThreeObject(node => {
+        const geometry = node.group === 'AM' 
+          ? new THREE.IcosahedronGeometry(node.val * 0.6, 0)
+          : new THREE.SphereGeometry(node.val * 0.5, 16, 16);
+        
+        return new THREE.Mesh(
+          geometry,
+          new THREE.MeshStandardMaterial({ 
+            color: node.color,
+            emissive: node.color,
+            emissiveIntensity: 0.2,
+            roughness: 0.4,
+            metalness: 0.6
+          })
+        );
+      })
+      .linkDirectionalParticleWidth(3)
+      .linkDirectionalParticleSpeed(0.008);
+    
+    window.resetView = function() {
+      Graph.cameraPosition({ x: 0, y: 0, z: 400 }, { x: 0, y: 0, z: 0 });
+    };
+  </script>
+</body>
+</html>

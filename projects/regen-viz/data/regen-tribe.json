@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    {"id": "Regen Tribe", "group": 1, "val": 20},
+    {"id": "Ecology", "group": 2, "val": 15},
+    {"id": "Hardware", "group": 2, "val": 15},
+    {"id": "Human Systems", "group": 2, "val": 15},
+    {"id": "Economy", "group": 2, "val": 15},
+    {"id": "Software", "group": 2, "val": 15},
+    {"id": "Climate", "group": 3, "val": 8},
+    {"id": "Biodiversity", "group": 3, "val": 8},
+    {"id": "Housing", "group": 4, "val": 8},
+    {"id": "Water", "group": 4, "val": 8},
+    {"id": "Energy", "group": 4, "val": 8},
+    {"id": "Food", "group": 4, "val": 8},
+    {"id": "Governance", "group": 5, "val": 8},
+    {"id": "Education", "group": 5, "val": 8},
+    {"id": "Health", "group": 5, "val": 8}
+  ],
+  "links": [
+    {"source": "Regen Tribe", "target": "Ecology"},
+    {"source": "Regen Tribe", "target": "Hardware"},
+    {"source": "Regen Tribe", "target": "Human Systems"},
+    {"source": "Regen Tribe", "target": "Economy"},
+    {"source": "Regen Tribe", "target": "Software"},
+    {"source": "Ecology", "target": "Climate"},
+    {"source": "Ecology", "target": "Biodiversity"},
+    {"source": "Hardware", "target": "Housing"},
+    {"source": "Hardware", "target": "Water"},
+    {"source": "Hardware", "target": "Energy"},
+    {"source": "Hardware", "target": "Food"},
+    {"source": "Human Systems", "target": "Governance"},
+    {"source": "Human Systems", "target": "Education"},
+    {"source": "Human Systems", "target": "Health"}
+  ]
+}

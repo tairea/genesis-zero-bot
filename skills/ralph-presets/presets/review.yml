@@ -1,0 +1,29 @@
+# Code Review
+# Pattern: Review Pipeline
+# Review code changes without modifications
+
+hats:
+  reviewer:
+    name: "Code Reviewer"
+    triggers: ["review.start", "analysis.complete"]
+    publishes: ["review.section", "review.complete"]
+    instructions: |
+      ## REVIEWER MODE
+      Review for correctness, clarity, maintainability.
+
+      Output:
+      ## Summary: APPROVE / REQUEST_CHANGES / COMMENT
+      ## Critical Issues (Must Fix)
+      ## Suggestions (Should Consider)
+      ## Nitpicks (Optional)
+      ## Positive Notes
+
+  analyzer:
+    name: "Deep Analyzer"
+    triggers: ["review.section"]
+    publishes: ["analysis.complete"]
+    instructions: |
+      ## ANALYZER MODE
+      Thorough analysis of code section.
+
+      Checks: correctness, edge cases, error handling, security, performance, testability

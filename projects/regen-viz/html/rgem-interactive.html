@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RGEM - Interactive</title>
+  <style>
+    body { margin: 0; background: #0d1117; overflow: hidden; font-family: monospace; }
+    #graph { width: 100vw; height: 100vh; }
+    #search {
+      position: absolute; top: 20px; right: 20px;
+      background: rgba(0,0,0,0.85); padding: 15px; border-radius: 8px;
+      border: 1px solid #30363d;
+    }
+    #search input {
+      background: #21262d; border: 1px solid #30363d; color: #fff;
+      padding: 8px 12px; border-radius: 6px; width: 200px; font-family: monospace;
+    }
+    #search input:focus { outline: none; border-color: #58a6ff; }
+    #info {
+      position: absolute; bottom: 20px; left: 20px;
+      background: rgba(0,0,0,0.85); padding: 15px; border-radius: 8px;
+      color: #8b949e; font-size: 12px; max-width: 300px;
+    }
+    #info h3 { margin: 0 0 10px 0; color: #58a6ff; font-size: 14px; }
+    #legend {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(0,0,0,0.85); padding: 15px; border-radius: 8px;
+      font-size: 11px; border: 1px solid #30363d;
+    }
+    .legend-title { font-weight: bold; margin-bottom: 8px; color: #58a6ff; }
+    .legend-item { display: flex; align-items: center; margin: 4px 0; }
+    .legend-color { width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  
+  <div id="legend">
+    <div class="legend-title">RGEM QUINT</div>
+    <div class="legend-item"><div class="legend-color" style="background:#e9c46a"></div>7ST - Subject Types</div>
+    <div class="legend-item"><div class="legend-color" style="background:#2a9d8f"></div>7RT - Relations</div>
+    <div class="legend-item"><div class="legend-color" style="background:#caf0f8"></div>7ALS - Lifecycle</div>
+    <div class="legend-item"><div class="legend-color" style="background:#4cc9f0"></div>7ASR - Stakeholders</div>
+    <div class="legend-item"><div class="legend-color" style="background:#ff6700"></div>5UBT - Base Types</div>
+  </div>
+  
+  <div id="search">
+    <input type="text" id="searchInput" placeholder="Filter nodes...">
+  </div>
+  
+  <div id="info">
+    <h3>Node Info</h3>
+    <div id="nodeInfo">Click a node to see details</div>
+  </div>
+  
+  <script>
+    let graphData;
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .jsonUrl('../data/unified/rgem-regen.json')
+      .nodeAutoColorBy('group')
+      .nodeLabel('label')
+      .linkColor(() => '#ffffff33')
+      .linkWidth(1.5)
+      .linkDirectionalArrowLength(3.5)
+      .linkDirectionalArrowRelPos(0.95)
+      .backgroundColor('#0d1117')
+      .nodeRelSize(6)
+      .onNodeClick(node => {
+        // Show node info
+        document.getElementById('nodeInfo').innerHTML = `
+          <strong>${node.label}</strong><br>
+          Type: ${node.type}<br>
+          Group: ${node.group}<br>
+          Value: ${node.val}
+        `;
+        
+        // Highlight connected nodes
+        const connectedIds = new Set();
+        graphData.links.forEach(l => {
+          if (l.source.id === node.id) connectedIds.add(l.target.id);
+          if (l.target.id === node.id) connectedIds.add(l.source.id);
+        });
+        
+        Graph.nodeColor(n => 
+          n.id === node.id ? '#ff6b6b' :
+          connectedIds.has(n.id) ? '#ffd93d' :
+          n.color
+        ).linkWidth(l => 
+          l.source.id === node.id || l.target.id === node.id ? 3 : 1
+        );
+      });
+    
+    // Load data for filtering
+    Graph.onGraphReady(() => {
+      graphData = Graph.graphData();
+    });
+    
+    // Search filter
+    document.getElementById('searchInput').addEventListener('input', e => {
+      const query = e.target.value.toLowerCase();
+      if (!graphData) return;
+      
+      Graph.nodeColor(n => {
+        if (!query) return n.color;
+        return n.label.toLowerCase().includes(query) ? n.color : '#333333';
+      }).nodeOpacity(n => {
+        if (!query) return 1;
+        return n.label.toLowerCase().includes(query) ? 1 : 0.2;
+      });
+    });
+  </script>
+</body>
+</html>

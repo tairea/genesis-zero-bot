@@ -1,0 +1,33 @@
+# Feature Development
+# Pattern: Pipeline
+# Builder → Reviewer cycle for feature work
+
+hats:
+  builder:
+    name: "Builder"
+    triggers: ["build.task"]
+    publishes: ["build.done", "build.blocked"]
+    instructions: |
+      ## BUILDER MODE
+      Implement one task with quality gates.
+
+      Process: Explore → Plan → Implement → Commit
+      1. EXPLORE - Understand current implementation
+      2. PLAN - Outline specific changes
+      3. IMPLEMENT - Write code, run verification
+      4. COMMIT - Document the change
+
+  reviewer:
+    name: "Reviewer"
+    triggers: ["review.request"]
+    publishes: ["review.approved", "review.changes_requested"]
+    instructions: |
+      ## REVIEWER MODE
+      Review implementation for quality.
+
+      Checklist:
+      - Correctness - matches spec?
+      - Tests - coverage?
+      - Patterns - follow codebase?
+      - Errors - handling appropriate?
+      - Security - any vulnerabilities?

@@ -1,0 +1,43 @@
+# Confidence-Gated Completion
+# Pattern: Critic-Actor with Verification Gate
+# Philosophy: Separate usefulness from honesty. Do not allow completion until self-audit reports high confidence.
+
+event_loop:
+  starting_event: "build.task"
+
+hats:
+  builder:
+    triggers: ["build.task"]
+    publishes: ["build.done"]
+    instructions: |
+      ## BUILDER MODE
+      Implement the requested task.
+
+      Complete the work and publish build.done when done.
+
+  confessor:
+    triggers: ["build.done"]
+    publishes: ["confession.clean", "confession.issues_found"]
+    instructions: |
+      ## CONFESSOR MODE
+      Self-audit your work.
+
+      Review what was built and assess:
+      - Is it complete?
+      - Are there bugs or issues?
+      - What might go wrong?
+      - What's missing?
+
+      If confident (>=80%) and nothing material found: publish confession.clean
+      If issues found: publish confession.issues_found
+
+  confession_handler:
+    triggers: ["confession.clean", "confession.issues_found"]
+    publishes: ["build.task", "escalate.human"]
+    instructions: |
+      ## HANDLER MODE
+      Handle confession results.
+
+      If confession.clean (confidence >= 80, no issues): LOOP_COMPLETE
+      If confession.issues_found: publish build.task to fix issues
+    default_publishes: "escalate.human"

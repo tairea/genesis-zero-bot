@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Conversation DAG - Regen Tribe</title>
+  <style>
+    body { margin: 0; background: #0d1117; overflow: hidden; font-family: monospace; }
+    #graph { width: 100vw; height: 100vh; }
+    #legend {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(0,0,0,0.85); padding: 15px; border-radius: 8px;
+      font-size: 11px; color: #fff; border: 1px solid #30363d;
+    }
+    .legend-title { font-weight: bold; margin-bottom: 8px; color: #58a6ff; }
+    .legend-item { display: flex; align-items: center; margin: 4px 0; }
+    .legend-color { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+    #stats {
+      position: absolute; top: 20px; right: 20px;
+      background: rgba(0,0,0,0.85); padding: 15px; border-radius: 8px;
+      font-size: 11px; color: #8b949e; border: 1px solid #30363d;
+    }
+    #title {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      color: #fff; font-size: 18px; letter-spacing: 2px; opacity: 0.7;
+    }
+    #controls {
+      position: absolute; bottom: 20px; right: 20px;
+      background: rgba(0,0,0,0.85); padding: 10px; border-radius: 8px;
+    }
+    button {
+      background: #21262d; border: 1px solid #30363d; color: #fff;
+      padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: monospace;
+    }
+    button:hover { border-color: #58a6ff; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  
+  <div id="legend">
+    <div class="legend-title">CONVERSATION DAG</div>
+    <div class="legend-item"><div class="legend-color" style="background:#e63946"></div>Topics (hubs)</div>
+    <div class="legend-item"><div class="legend-color" style="background:#58a6ff"></div>Actors (people)</div>
+    <div class="legend-item"><div class="legend-color" style="background:#8b949e"></div>Messages</div>
+    <div style="margin-top:8px;color:#666;font-size:10px;">
+      ← authored<br>
+      → in topic<br>
+      ↔ sequence
+    </div>
+  </div>
+  
+  <div id="stats">
+    <div>2824 messages</div>
+    <div>139 participants</div>
+    <div>26 topics</div>
+  </div>
+  
+  <div id="title">REGEN TRIBE CONVERSATION HISTORY</div>
+  
+  <div id="controls">
+    <button id="btn-topics">Topics</button>
+    <button id="btn-actors">Actors</button>
+    <button id="btn-reset">Reset</button>
+  </div>
+  
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    
+    let graphData;
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .jsonUrl('../data/unified/conversation-dag.json')
+      .nodeAutoColorBy('group')
+      .nodeLabel('label')
+      .linkColor(link => {
+        if (link.type === 'authored') return '#58a6ff44';
+        if (link.type === 'in_topic') return '#e6394633';
+        if (link.type === 'sequence') return '#ffffff22';
+        return '#ffffff22';
+      })
+      .linkWidth(1)
+      .linkDirectionalArrowLength(3)
+      .linkDirectionalArrowRelPos(0.9)
+      .backgroundColor('#0d1117')
+      .nodeRelSize(6)
+      .nodeThreeObject(node => {
+        let geometry;
+        if (node.group === 'Topic') {
+          geometry = new THREE.IcosahedronGeometry(node.val * 0.8, 1);
+        } else if (node.group === 'Actor') {
+          geometry = new THREE.CylinderGeometry(node.val * 0.4, node.val * 0.4, node.val * 0.6, 8);
+        } else {
+          geometry = new THREE.SphereGeometry(node.val * 0.5, 8, 8);
+        }
+        
+        return new THREE.Mesh(
+          geometry,
+          new THREE.MeshStandardMaterial({ 
+            color: node.color,
+            emissive: node.color,
+            emissiveIntensity: 0.2,
+            roughness: 0.4,
+            metalness: 0.6
+          })
+        );
+      })
+      .onNodeClick(node => {
+        const connected = new Set();
+        const nodeLinks = [];
+        
+        graphData.links.forEach(l => {
+          const s = typeof l.source === 'object' ? l.source.id : l.source;
+          const t = typeof l.target === 'object' ? l.target.id : l.target;
+          if (s === node.id || t === node.id) {
+            connected.add(s);
+            connected.add(t);
+            nodeLinks.push(l);
+          }
+        });
+        
+        Graph
+          .nodeColor(n => n.id === node.id ? '#ff6b6b' : (connected.has(n.id) ? n.color : '#333333'))
+          .nodeOpacity(n => n.id === node.id || connected.has(n.id) ? 1 : 0.2)
+          .linkWidth(l => nodeLinks.includes(l) ? 2 : 0.5)
+          .linkOpacity(l => nodeLinks.includes(l) ? 1 : 0.1);
+      });
+    
+    Graph.onGraphReady(() => {
+      graphData = Graph.graphData();
+    });
+    
+    window.focusTopics = function() {
+      const topics = graphData.nodes.filter(n => n.group === 'Topic');
+      if (topics.length) {
+        const center = topics[Math.floor(topics.length / 2)];
+        Graph.cameraPosition({ x: center.x * 1.5, y: center.y * 1.5, z: 300 }, center, 2000);
+      }
+    };
+    
+    window.focusActors = function() {
+      Graph.cameraPosition({ x: 0, y: 0, z: 400 }, { x: 0, y: 0, z: 0 }, 2000);
+    };
+    
+    window.resetView = function() {
+      Graph.nodeOpacity(1).nodeColor(n => n.color).linkWidth(1).linkOpacity(1);
+      Graph.cameraPosition({ x: 0, y: 0, z: 400 }, { x: 0, y: 0, z: 0 }, 1000);
+    };
+    
+    document.getElementById('btn-topics').onclick = () => window.focusTopics();
+    document.getElementById('btn-actors').onclick = () => window.focusActors();
+    document.getElementById('btn-reset').onclick = () => window.resetView();
+  </script>
+</body>
+</html>

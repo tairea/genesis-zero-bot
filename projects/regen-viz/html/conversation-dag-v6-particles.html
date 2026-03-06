@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Conversation DAG - Particle Flow</title>
+  <style>
+    body { margin: 0; background: #050508; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+    #info {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(0,0,0,0.85); padding: 15px; border-radius: 8px;
+      font-family: monospace; font-size: 12px; color: #8b949e;
+      border: 1px solid #222;
+    }
+    h3 { margin: 0 0 10px 0; color: #7209b7; font-size: 14px; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="info">
+    <h3>✨ Particle Flow</h3>
+    <div>Animated particles show message flow</div>
+  </div>
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    
+    const gData = await fetch('../data/unified/conversation-dag.json').then(r => r.json());
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .graphData(gData)
+      .backgroundColor('#050508')
+      .nodeColor(node => node.color || '#58a6ff')
+      .nodeLabel('label')
+      .nodeRelSize(6)
+      .linkColor(link => {
+        // Different colors for different link types
+        if (link.type === 'authored') return 'rgba(88,166,255,0.4)';
+        if (link.type === 'in_topic') return 'rgba(230,57,70,0.3)';
+        return 'rgba(255,255,255,0.15)';
+      })
+      .linkWidth(2)
+      .linkDirectionalArrowLength(3.5)
+      .linkDirectionalArrowRelPos(0.9)
+      // Animated particles flowing along links
+      .linkDirectionalParticleWidth(link => 2 + Math.random() * 2)
+      .linkDirectionalParticleSpeed(0.006)
+      .linkDirectionalParticleColor(link => {
+        if (link.type === 'authored') return '#58a6ff';
+        if (link.type === 'in_topic') return '#e63946';
+        return '#ffffff';
+      });
+    
+    // Auto-rotate slowly
+    Graph.cameraAutoRotate(true);
+    Graph.cameraAutoRotateSpeed(0.5);
+  </script>
+</body>
+</html>

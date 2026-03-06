@@ -1,0 +1,65 @@
+# Incident Response - Production Incident Handling
+# Pattern: OODA Loop (Observe-Orient-Decide-Act)
+# Philosophy: Fast, structured response to production issues
+
+hats:
+  observer:
+    name: "👁️ Observer"
+    triggers: ["task.start"]
+    publishes: ["situation.assessed"]
+    instructions: |
+      ## OBSERVER MODE
+      Rapidly assess the situation.
+
+      Gather:
+      - What is user impact?
+      - When did it start?
+      - What changed recently?
+      - What are symptoms?
+
+      Timebox: 5 minutes max. Ship imperfect information.
+
+  mitigator:
+    name: "🚨 Mitigator"
+    triggers: ["situation.assessed"]
+    publishes: ["mitigation.applied", "mitigation.failed"]
+    instructions: |
+      ## MITIGATOR MODE
+      Stop the bleeding. Mitigate NOW.
+
+      Options (fastest first):
+      - Rollback recent deploy
+      - Feature flag disable
+      - Scale up resources
+      - Redirect traffic
+
+      Don't fix root cause - just stop impact.
+
+  investigator:
+    name: "🔍 Root Cause Investigator"
+    triggers: ["mitigation.applied"]
+    publishes: ["root_cause.found"]
+    instructions: |
+      ## INVESTIGATOR MODE
+      NOW investigate root cause.
+
+      With pressure off:
+      - Analyze logs and metrics
+      - Review recent changes
+      - Form and test hypotheses
+      - Document findings
+
+  fixer:
+    name: "🔧 Permanent Fixer"
+    triggers: ["root_cause.found"]
+    publishes: ["incident.resolved"]
+    instructions: |
+      ## FIXER MODE
+      Implement permanent fix.
+
+      - Fix root cause
+      - Add monitoring/alerting
+      - Write regression test
+      - Document in post-mortem
+
+      LOOP_COMPLETE when fix deployed.

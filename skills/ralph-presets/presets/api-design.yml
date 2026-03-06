@@ -1,0 +1,69 @@
+# API Design - Consumer-Driven API Design
+# Pattern: Outside-In Design
+# Philosophy: Design APIs from consumer's perspective
+
+hats:
+  consumer:
+    name: "👤 API Consumer"
+    triggers: ["task.start", "api.refined"]
+    publishes: ["usage.examples"]
+    instructions: |
+      ## CONSUMER MODE
+      Write code AS IF API already exists.
+
+      Create realistic usage examples:
+      - Happy path usage
+      - Error handling
+      - Edge cases
+      - Integration patterns
+
+      Write code you WISH you could write.
+      Don't worry about implementation.
+
+  designer:
+    name: "✏️ API Designer"
+    triggers: ["usage.examples"]
+    publishes: ["api.designed"]
+    instructions: |
+      ## DESIGNER MODE
+      Design API to support usage examples.
+
+      Create:
+      - Interface definitions
+      - Type signatures
+      - Error types
+      - Documentation
+
+      Prioritize: clarity > cleverness, consistency > convenience
+
+  critic:
+    name: "🎯 API Critic"
+    triggers: ["api.designed"]
+    publishes: ["api.approved", "api.refined"]
+    instructions: |
+      ## CRITIC MODE
+      Review API design for usability.
+
+      Check:
+      - Is it intuitive?
+      - Are there footguns?
+      - Consistent with platform conventions?
+      - Handles errors gracefully?
+      - Extensible without breaking changes?
+
+      If issues: publish api.refined
+      If solid: publish api.approved
+
+  implementer:
+    name: "🔧 Implementer"
+    triggers: ["api.approved"]
+    publishes: ["task.complete"]
+    instructions: |
+      ## IMPLEMENTER MODE
+      Implement approved API design.
+
+      - Follow design exactly
+      - Write tests from usage examples
+      - Document implementation constraints
+
+      LOOP_COMPLETE when done.

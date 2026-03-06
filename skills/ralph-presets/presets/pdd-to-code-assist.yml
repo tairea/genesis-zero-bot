@@ -1,0 +1,93 @@
+# PDD-to-Code-Assist
+# Pattern: Full Pipeline
+# Ralph debates from rough idea to committed, tested code
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 150
+
+hats:
+  inquisitor:
+    name: "🎯 Inquisitor"
+    triggers: ["design.start", "answer.proposed", "design.rejected"]
+    publishes: ["question.asked", "requirements.complete"]
+    instructions: |
+      ## INQUISITOR MODE
+      Refine requirements through questioning.
+
+      Ask ONE probing question at a time:
+      - Scope: What is OUT of scope?
+      - Users: Who will use this?
+      - Constraints: What limits exist?
+      - Success: How will we know done?
+      - Edge cases: What if X fails?
+
+  architect:
+    name: "💭 Architect"
+    triggers: ["question.asked", "requirements.complete"]
+    publishes: ["answer.proposed", "design.drafted"]
+    instructions: |
+      ## ARCHITECT MODE
+      Answer questions, synthesize designs.
+
+      When requirements.complete:
+      - Write requirements.md
+      - Write design.md with Mermaid diagrams
+
+  design_critic:
+    name: "⚖️ Design Critic"
+    triggers: ["design.drafted"]
+    publishes: ["design.approved", "design.rejected"]
+    instructions: |
+      ## CRITIC MODE
+      Adversarial design review.
+
+      Check completeness, feasibility, simplicity, testability, clarity.
+
+  explorer:
+    name: "🔍 Explorer"
+    triggers: ["design.approved"]
+    publishes: ["context.ready"]
+    instructions: |
+      ## EXPLORER MODE
+      Research codebase patterns.
+
+  planner:
+    name: "📋 Planner"
+    triggers: ["context.ready"]
+    publishes: ["plan.ready"]
+    instructions: |
+      ## PLANNER MODE
+      Create test strategy and implementation plan.
+
+  task_writer:
+    name: "📝 Task Writer"
+    triggers: ["plan.ready"]
+    publishes: ["tasks.ready"]
+    instructions: |
+      ## TASK WRITER MODE
+      Create code task files from plan.
+
+  builder:
+    name: "⚙️ Builder"
+    triggers: ["tasks.ready", "validation.failed", "task.complete"]
+    publishes: ["implementation.ready", "task.complete"]
+    instructions: |
+      ## BUILDER MODE
+      TDD implementation: RED → GREEN → REFACTOR.
+
+  validator:
+    name: "✅ Validator"
+    triggers: ["implementation.ready"]
+    publishes: ["validation.passed", "validation.failed"]
+    instructions: |
+      ## VALIDATOR MODE
+      Exhaustive quality gate.
+
+  committer:
+    name: "📦 Committer"
+    triggers: ["validation.passed"]
+    publishes: ["LOOP_COMPLETE"]
+    instructions: |
+      ## COMMITTER MODE
+      Create conventional commit.

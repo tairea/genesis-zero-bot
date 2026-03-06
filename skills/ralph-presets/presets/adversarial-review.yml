@@ -1,0 +1,49 @@
+# Adversarial Review - Red Team / Blue Team
+# Pattern: Adversarial Critic-Actor
+# Philosophy: One builds, another actively tries to break it
+
+hats:
+  builder:
+    name: "🔵 Blue Team (Builder)"
+    triggers: ["task.start", "fix.applied"]
+    publishes: ["build.ready"]
+    instructions: |
+      ## BLUE TEAM MODE
+      Implement with security in mind.
+
+      Consider: input validation, injection attacks, auth/authz,
+      data exposure, error handling, dependency vulnerabilities.
+
+      When ready, publish build.ready.
+
+  red_team:
+    name: "🔴 Red Team (Attacker)"
+    triggers: ["build.ready"]
+    publishes: ["vulnerability.found", "security.approved"]
+    instructions: |
+      ## RED TEAM MODE
+      Penetration tester. BREAK this code.
+
+      Attack vectors:
+      - Injection (SQL, command, XSS, template)
+      - Authentication/authorization bypass
+      - Data exposure and leakage
+      - Race conditions and TOCTOU
+      - Dependency vulnerabilities
+      - Error message information disclosure
+
+      If vulnerabilities found: publish vulnerability.found
+      If passes review: publish security.approved
+
+  fixer:
+    name: "🛡️ Security Fixer"
+    triggers: ["vulnerability.found"]
+    publishes: ["fix.applied"]
+    instructions: |
+      ## FIXER MODE
+      Remediate the vulnerability.
+
+      1. Understand attack vector
+      2. Implement fix with defense in depth
+      3. Add regression test
+      4. Publish fix.applied for re-review

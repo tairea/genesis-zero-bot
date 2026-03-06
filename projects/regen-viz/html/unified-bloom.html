@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Regen Tribe - Bloom Effect</title>
+  <style>
+    body { margin: 0; background: #000; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+  <script src="https://unpkg.com/postprocessing@6.29.2/build/postprocessing.js"></script>
+</head>
+<body>
+  <div id="graph"></div>
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    
+    const Graph = new ForceGraph3D(document.getElementById('graph'))
+      .jsonUrl('../data/unified/meta-fractal-dao.json')
+      .nodeAutoColorBy('group')
+      .nodeLabel('label')
+      .backgroundColor('#000000')
+      .nodeRelSize(8)
+      .linkWidth(1.5)
+      .linkDirectionalArrowLength(3.5)
+      .linkDirectionalArrowRelPos(1);
+    
+    // Add bloom post-processing
+    Graph.postProcessingComposer().addPass(
+      new THREE.BloomEffect({ bloomStrength: 1.5, bloomRadius: 0.4, bloomThreshold: 0.1 })
+    );
+  </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+# Deployment Workflow
+# Pattern: Pipeline
+# Planner → Builder → Deployer → Verifier cycle
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+
+hats:
+  builder:
+    name: "Builder"
+    triggers: ["build.task"]
+    publishes: ["build.done", "build.blocked"]
+    instructions: |
+      ## BUILDER MODE
+      Build artifacts for deployment.
+
+  deployer:
+    name: "Deployer"
+    triggers: ["deploy.ready", "deploy.start", "deploy.rollback"]
+    publishes: ["deploy.start", "deploy.done", "deploy.failed"]
+    instructions: |
+      ## DEPLOYER MODE
+      Execute deployment steps and handle rollbacks.
+
+      Options:
+      - Rollback recent deploy
+      - Feature flag disable
+      - Scale up resources
+      - Redirect traffic
+
+  verifier:
+    name: "Verifier"
+    triggers: ["deploy.done"]
+    publishes: ["verify.pass", "verify.fail", "deploy.rollback"]
+    instructions: |
+      ## VERIFIER MODE
+      Verify deployment via health checks and smoke tests.
+
+      If verified: LOOP_COMPLETE
+      If failed: publish deploy.rollback

@@ -1,0 +1,18 @@
+# Ralph Config - Codex Backend
+
+event_loop:
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 100
+  max_runtime_seconds: 14400
+  idle_timeout_secs: 1800
+
+cli:
+  backend: "codex"
+  prompt_mode: "arg"
+
+core:
+  specs_dir: "./specs/"
+  guardrails:
+    - "Fresh context each iteration"
+    - "Verification mandatory"
+    - "Confidence protocol: score 0-100"
