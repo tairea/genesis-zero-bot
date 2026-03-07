@@ -32,6 +32,29 @@ Usage:
 
     # Stats: show what's in the DB
     python pipeline.py stats
+
+    # Embed text chunks for passage-level retrieval
+    python pipeline.py embed-chunks
+
+    # Community detection
+    python pipeline.py communities detect --summarize
+    python pipeline.py communities list
+    python pipeline.py communities search "regenerative design"
+
+    # Hybrid retrieval (vector + graph + chunks)
+    python pipeline.py retrieve "what is permaculture?" --hops 2
+
+    # Entity resolution
+    python pipeline.py resolve --dry-run
+
+    # Cleanup junk concepts
+    python pipeline.py cleanup --dry-run
+
+    # Evaluation
+    python pipeline.py evaluate health
+    python pipeline.py evaluate retrieval
+    python pipeline.py evaluate extraction --ground-truth eval_gt.json
+    python pipeline.py evaluate generate-ground-truth "Quick_Reference_One_Pager.md"
 """
 
 import argparse
@@ -190,7 +213,7 @@ async def cmd_stats(args):
     await db.signin({"username": DB_USER, "password": DB_PASS})
     await db.use(DB_NS, DB_DB)
 
-    tables = ["document", "chunk", "concept", "contains", "mentions", "relates"]
+    tables = ["document", "chunk", "concept", "contains", "mentions", "relates", "community", "belongs_to"]
     print(f"Database: {DB_NS}/{DB_DB}\n")
     for table in tables:
         result = await db.query(f"SELECT count() as cnt FROM {table} GROUP ALL")
@@ -243,6 +266,124 @@ async def cmd_stats(args):
     await db.close()
 
 
+async def cmd_resolve(args):
+    """Find and merge duplicate entities."""
+    from entity_resolution import resolve_entities
+
+    db = await _connect_db()
+    result = await resolve_entities(
+        db,
+        threshold=args.threshold,
+        dry_run=args.dry_run,
+        verbose=args.verbose,
+    )
+    import json
+    print(json.dumps(result, indent=2))
+    await db.close()
+
+
+async def cmd_retrieve(args):
+    """Hybrid graph+vector retrieval."""
+    from retriever import retrieve
+    import json
+
+    db = await _connect_db()
+    ctx = await retrieve(
+        db, args.query,
+        limit=args.limit,
+        hops=args.hops,
+        include_chunks=not args.no_chunks,
+    )
+
+    if args.json:
+        print(json.dumps(ctx.to_dict(), indent=2, default=str))
+    else:
+        print(ctx.text)
+        print(f"\n---\n{len(ctx.concepts)} concepts, {len(ctx.relations)} relations, {len(ctx.communities)} communities, {len(ctx.chunks)} chunks")
+
+    await db.close()
+
+
+async def cmd_embed_chunks(args):
+    """Generate vector embeddings for text chunks."""
+    from embeddings import embed_chunks
+
+    db = await _connect_db()
+    force = getattr(args, "force", False)
+    count = await embed_chunks(db, batch_size=getattr(args, "batch_size", 50), force=force)
+    print(f"\nEmbedded {count} chunks")
+    await db.close()
+
+
+async def cmd_communities(args):
+    """Community detection and search."""
+    import json
+    from communities import detect_communities, search_communities
+
+    db = await _connect_db()
+
+    if args.subcmd == "detect":
+        result = await detect_communities(
+            db,
+            min_size=args.min_size,
+            summarize=args.summarize,
+            verbose=True,
+        )
+        print(json.dumps(result, indent=2))
+
+    elif args.subcmd == "list":
+        comms = await db.query(
+            "SELECT name, summary, member_count, top_types FROM community ORDER BY member_count DESC"
+        )
+        for c in (comms or []):
+            print(f"\n[{c.get('member_count', 0)} members] {c.get('name', '?')}")
+            if c.get("summary"):
+                print(f"  {c['summary']}")
+
+    elif args.subcmd == "search":
+        results = await search_communities(db, args.query, limit=args.limit)
+        for r in results:
+            print(f"\n[{r.get('score', 0):.3f}] {r.get('name', '?')} ({r.get('member_count', 0)} members)")
+            if r.get("summary"):
+                print(f"  {r['summary']}")
+
+    await db.close()
+
+
+async def cmd_cleanup(args):
+    """Remove junk concepts from the graph."""
+    from cleanup import cleanup
+    await cleanup(dry_run=args.dry_run, verbose=True)
+
+
+async def cmd_evaluate(args):
+    """Run evaluation metrics."""
+    from evaluate import graph_health, eval_retrieval, eval_extraction, generate_ground_truth_template
+    import json
+
+    db = await _connect_db()
+
+    if args.subcmd == "health":
+        result = await graph_health(db)
+        clean = {k: v for k, v in result.items() if k not in ("type_distribution", "verb_distribution")}
+        print(f"\n{json.dumps(clean, indent=2)}")
+
+    elif args.subcmd == "retrieval":
+        result = await eval_retrieval(db, verbose=not args.json)
+        if args.json:
+            print(json.dumps(result, indent=2))
+
+    elif args.subcmd == "extraction":
+        result = await eval_extraction(db, args.ground_truth, verbose=not args.json)
+        if args.json:
+            print(json.dumps(result, indent=2))
+
+    elif args.subcmd == "generate-ground-truth":
+        await generate_ground_truth_template(db, args.doc_title, args.output)
+
+    await db.close()
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="pipeline",
@@ -286,16 +427,70 @@ def main():
     # stats
     sub.add_parser("stats", help="Show database statistics")
 
+    # resolve — entity deduplication
+    p_resolve = sub.add_parser("resolve", help="Find and merge duplicate entities")
+    p_resolve.add_argument("--threshold", type=float, default=0.88,
+                           help="Similarity threshold (default: 0.88)")
+    p_resolve.add_argument("--dry-run", action="store_true", help="Find candidates without merging")
+    p_resolve.add_argument("-v", "--verbose", action="store_true")
+
+    # retrieve — hybrid search
+    p_retrieve = sub.add_parser("retrieve", help="Hybrid graph+vector retrieval")
+    p_retrieve.add_argument("query", help="Natural language query")
+    p_retrieve.add_argument("--limit", type=int, default=10, help="Max results")
+    p_retrieve.add_argument("--hops", type=int, default=1, help="Graph traversal depth (1 or 2)")
+    p_retrieve.add_argument("--json", action="store_true", help="Output raw JSON")
+    p_retrieve.add_argument("--no-chunks", action="store_true", help="Skip source chunk retrieval")
+
+    # embed-chunks — chunk-level embeddings
+    p_echunks = sub.add_parser("embed-chunks", help="Generate embeddings for text chunks")
+    p_echunks.add_argument("--force", action="store_true", help="Re-embed all chunks")
+    p_echunks.add_argument("--batch-size", type=int, default=50)
+
+    # communities — community detection + search
+    p_comm = sub.add_parser("communities", help="Community detection and search")
+    comm_sub = p_comm.add_subparsers(dest="subcmd", required=True)
+    p_comm_detect = comm_sub.add_parser("detect", help="Detect communities via label propagation")
+    p_comm_detect.add_argument("--min-size", type=int, default=3, help="Min community size")
+    p_comm_detect.add_argument("--summarize", action="store_true", help="Generate LLM summaries")
+    p_comm_list = comm_sub.add_parser("list", help="List existing communities")
+    p_comm_search = comm_sub.add_parser("search", help="Search community summaries")
+    p_comm_search.add_argument("query", help="Search query")
+    p_comm_search.add_argument("--limit", type=int, default=5)
+
+    # cleanup — remove junk concepts
+    p_cleanup = sub.add_parser("cleanup", help="Remove junk concepts from the graph")
+    p_cleanup.add_argument("--dry-run", action="store_true", help="Preview without deleting")
+
+    # evaluate — quality metrics
+    p_eval = sub.add_parser("evaluate", help="Evaluation and quality metrics")
+    eval_sub = p_eval.add_subparsers(dest="subcmd", required=True)
+    eval_sub.add_parser("health", help="Graph health metrics")
+    p_eval_ret = eval_sub.add_parser("retrieval", help="Evaluate retrieval quality")
+    p_eval_ret.add_argument("--json", action="store_true", help="Output raw JSON")
+    p_eval_ext = eval_sub.add_parser("extraction", help="Evaluate extraction against ground truth")
+    p_eval_ext.add_argument("--ground-truth", required=True, help="Path to ground truth JSON")
+    p_eval_ext.add_argument("--json", action="store_true")
+    p_eval_gt = eval_sub.add_parser("generate-ground-truth", help="Generate ground truth template")
+    p_eval_gt.add_argument("doc_title", help="Document title")
+    p_eval_gt.add_argument("--output", "-o", help="Output file path")
+
     args = parser.parse_args()
 
     cmd_map = {
         "ingest": cmd_ingest,
         "embed": cmd_embed,
+        "embed-chunks": cmd_embed_chunks,
         "search": cmd_search,
         "similar": cmd_similar,
         "viz": cmd_viz,
         "export": cmd_export,
         "stats": cmd_stats,
+        "resolve": cmd_resolve,
+        "retrieve": cmd_retrieve,
+        "communities": cmd_communities,
+        "cleanup": cmd_cleanup,
+        "evaluate": cmd_evaluate,
     }
 
     asyncio.run(cmd_map[args.command](args))

@@ -120,6 +120,55 @@ async def embed_concepts(db, batch_size: int = 100, force: bool = False) -> int:
     return embedded
 
 
+async def embed_chunks(db, batch_size: int = 50, force: bool = False) -> int:
+    """
+    Generate and store embeddings for text chunks that don't have one yet.
+    Enables passage-level retrieval alongside concept-level search.
+    """
+    if force:
+        chunks = await db.query("SELECT id, text, chunk_type FROM chunk")
+    else:
+        chunks = await db.query(
+            "SELECT id, text, chunk_type FROM chunk WHERE embedding IS NONE"
+        )
+
+    if not chunks:
+        return 0
+
+    # Ensure chunk embedding schema
+    await db.query(
+        'DEFINE FIELD IF NOT EXISTS embedding ON chunk TYPE option<array<float>> '
+        'COMMENT "Vector embedding (1536d)"'
+    )
+    await db.query(
+        "DEFINE INDEX IF NOT EXISTS chunk_embedding ON chunk "
+        f"FIELDS embedding HNSW DIMENSION {EMBEDDING_DIM} DIST COSINE"
+    )
+
+    total = len(chunks)
+    embedded = 0
+
+    for i in range(0, total, batch_size):
+        batch = chunks[i : i + batch_size]
+        texts = [c.get("text", "")[:2000] for c in batch]  # Truncate long chunks
+
+        try:
+            vectors = embed_texts(texts)
+        except Exception as e:
+            print(f"  Chunk embedding batch {i//batch_size + 1} failed: {e}", file=sys.stderr)
+            continue
+
+        for chunk, vector in zip(batch, vectors):
+            cid = chunk["id"]
+            await db.query("UPDATE $id SET embedding = $vec", {"id": cid, "vec": vector})
+            embedded += 1
+
+        done = min(i + batch_size, total)
+        print(f"  Embedded {done}/{total} chunks", file=sys.stderr)
+
+    return embedded
+
+
 async def search(db, query: str, limit: int = 10, min_score: float = 0.0) -> list[dict]:
     """
     Semantic search: find concepts most similar to a natural language query.

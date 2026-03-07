@@ -38,14 +38,26 @@ def _get_client() -> OpenAI:
 
 # ── Prompts ───────────────────────────────────────────────────────────────────
 
-_SYSTEM_PROMPT = """You are a semantic graph extraction engine.
+_SYSTEM_PROMPT = """You are a semantic graph extraction engine for RegenTribes, a regenerative community platform.
 
 Given text chunks, extract:
-1. CONCEPTS — named entities, systems, processes, ideas, people, places, events
+1. CONCEPTS — named entities, systems, processes, ideas, people, places, events, skills, resources, organizations, practices
 2. RELATIONS — directed semantic edges between concepts
 
-## Concept types
-entity | system | process | idea | attribute | event | person | place | quantity | quality | relation
+## Concept types (choose the MOST SPECIFIC type)
+person         — named individuals, community members, roles (e.g. "Ian", "Local Coordinator", "Facilitator")
+organization   — groups, companies, cooperatives, DAOs, collectives (e.g. "RegenTribes", "Sunrise Labs")
+project        — initiatives, programs, ventures, campaigns (e.g. "Eco-Housing Project", "Regen Week")
+skill          — capabilities, competencies, expertise areas (e.g. "Permaculture Design", "Facilitation", "Composting")
+resource       — tangible or intangible assets: land, tools, funding, materials, data (e.g. "Community Land", "Seed Library", "Grant Funding")
+place          — physical locations, neighborhoods, regions, sites (e.g. "Auckland", "Site A", "Food Forest")
+event          — gatherings, meetings, workshops, milestones (e.g. "Weekly Circle", "Regen Week 2026", "Buildathon")
+system         — frameworks, platforms, architectures, methodologies (e.g. "Meta-Fractal DAO", "SurrealDB", "RGEM")
+process        — workflows, procedures, sequences, pipelines (e.g. "Community Alchemy", "Spiral Development", "Consensus Building")
+practice       — techniques, methods, traditions, design patterns (e.g. "Companion Planting", "Sociocracy", "Seed Saving")
+idea           — principles, values, theories, visions (e.g. "Food Sovereignty", "Regenerative Development", "Commons")
+attribute      — properties, measurements, specifications, metrics (e.g. "Carbon Footprint", "Member Count", "Budget")
+quantity       — specific numbers, amounts, thresholds (e.g. "70% Agreement Target", "$200K Budget")
 
 ## Rung levels (abstraction depth)
 R0=literal name  R1=shallow inference  R2=contextual  R3=analogical
@@ -67,7 +79,7 @@ Return ONLY valid JSON matching this schema exactly:
   "concepts": [
     {{
       "name": "string",
-      "type": "entity|system|process|idea|attribute|event|person|place|quantity|quality|relation",
+      "type": "person|organization|project|skill|resource|place|event|system|process|practice|idea|attribute|quantity",
       "description": "one-sentence description",
       "rung": 0,
       "aliases": [],
@@ -98,6 +110,15 @@ Rules:
 - Aliases: include acronyms, alternate names, camelCase variants
 - Evidence: quote ≤50 chars from the source text
 - Do NOT invent facts not present in the text
+
+## CRITICAL: What makes a good concept
+- GOOD concepts: named entities, proper nouns, domain-specific terms, tools, frameworks, techniques, organizations, named processes
+  Examples: "Permaculture", "SurrealDB", "Composting", "Community Land Trust", "Biomass Gasification"
+- BAD concepts: generic verbs, adjectives, common words, function words, pronouns, articles
+  DO NOT extract: "Add", "Remove", "Table", "following", "using", "Active", "New", "Try", "Are", "Does", "Get"
+- Concept names must be CLEAN: no newlines, no trailing fragments like "\\nSee" or "\\nThe", no partial sentences
+- Descriptions must be specific to the source text, not just "Extracted from documentation"
+- If a chunk is mostly code or config syntax, extract the TOOLS and FRAMEWORKS, not code tokens
 """.format(verb_hint=category_prompt_hint())
 
 
@@ -148,18 +169,86 @@ def extract_batch(chunks: list[dict], model: str | None = None) -> dict:
     return parsed
 
 
+def _is_junk_concept(name: str) -> bool:
+    """Filter out generic/stopword concepts that aren't meaningful graph nodes."""
+    # Too short to be meaningful
+    if len(name) <= 2:
+        return True
+    # Contains newlines (parsing artifact)
+    if "\n" in name:
+        return True
+    # Common stopwords that should never be concepts
+    STOP_CONCEPTS = {
+        "a", "an", "the", "is", "are", "was", "were", "be", "been", "being",
+        "have", "has", "had", "do", "does", "did", "will", "would", "could",
+        "should", "may", "might", "shall", "can", "need", "must",
+        "for", "and", "but", "or", "nor", "not", "no", "yes", "yet",
+        "if", "then", "else", "when", "where", "how", "what", "which", "who",
+        "this", "that", "these", "those", "it", "its", "they", "them", "we",
+        "add", "get", "set", "put", "run", "let", "try", "use", "see", "new",
+        "old", "big", "top", "end", "ask", "say", "go", "all", "any", "few",
+        "most", "some", "each", "every", "both", "many", "much", "more",
+        "other", "same", "such", "also", "just", "only", "very", "too",
+        "now", "here", "there", "why", "often", "never", "always",
+        "true", "false", "none", "null", "ok", "done", "found", "made",
+        "show", "hide", "move", "call", "take", "give", "keep", "make",
+        "come", "know", "think", "want", "look", "find", "tell", "turn",
+        "start", "begin", "stop", "close", "open", "read", "write",
+        "actual", "active", "added", "adjust", "allow", "better", "built",
+        "clear", "common", "currently", "default", "final", "following",
+        "general", "good", "great", "initial", "last", "main", "next",
+        "present", "primary", "related", "required", "similar", "simple",
+        "specific", "standard", "using", "various", "without",
+    }
+    if name.lower() in STOP_CONCEPTS:
+        return True
+    # Single generic word (lowercase, no spaces) — likely not a domain concept
+    if " " not in name and name[0].islower() and len(name) <= 8:
+        return True
+    return False
+
+
+_VALID_TYPES = {
+    "person", "organization", "project", "skill", "resource", "place", "event",
+    "system", "process", "practice", "idea", "attribute", "quantity",
+}
+# Map old/variant types to new ontology
+_TYPE_MAP = {
+    "entity": "system",  # generic fallback
+    "quality": "attribute",
+    "relation": "idea",
+    "concept": "idea",
+    "specification": "system",
+}
+
+
+def _normalize_type(raw_type: str) -> str:
+    """Map concept types to the RegenTribes ontology."""
+    t = raw_type.lower().strip()
+    if t in _VALID_TYPES:
+        return t
+    return _TYPE_MAP.get(t, "system")
+
+
 def normalize_parsed(parsed: dict, chunk_ids: list[str], doc_id: str) -> dict:
     """
     Post-process raw LLM output:
+    - Filter junk/generic concepts
     - Normalize verb names via taxonomy
+    - Clean concept names (strip newlines, fragments)
     - Add source provenance
     - Fill defaults
     """
     concepts = []
     for c in parsed.get("concepts", []):
+        name = str(c.get("name", "")).strip()
+        # Clean newlines from names
+        name = name.split("\n")[0].strip()
+        if not name or _is_junk_concept(name):
+            continue
         concepts.append({
-            "name": str(c.get("name", "")).strip(),
-            "type": c.get("type", "entity"),
+            "name": name,
+            "type": _normalize_type(c.get("type", "entity")),
             "description": c.get("description", ""),
             "rung": int(c.get("rung", 0)),
             "aliases": c.get("aliases", []),

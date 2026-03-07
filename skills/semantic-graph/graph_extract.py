@@ -231,10 +231,20 @@ class GraphExtractor:
                 },
             )
 
-            # document → chunk edge
+            # document → chunk edge (stable ID prevents duplicates on re-ingestion)
+            contains_key = f"{doc_id}_{chunk_id}"
+            contains_hash = hashlib.sha256(contains_key.encode()).hexdigest()[:16]
             await self._db.query(
-                "RELATE $doc_id->contains->$chunk_id",
-                {"doc_id": _rid(doc_id), "chunk_id": _rid(chunk_id)},
+                """
+                INSERT RELATION INTO contains {
+                    id: $id, in: $doc_id, out: $chunk_id
+                } ON DUPLICATE KEY UPDATE id = $input.id
+                """,
+                {
+                    "id": _rid(f"contains:{contains_hash}"),
+                    "doc_id": _rid(doc_id),
+                    "chunk_id": _rid(chunk_id),
+                },
             )
 
             chunk_ids.append(chunk_id)
@@ -252,16 +262,19 @@ class GraphExtractor:
 
         # ── Step 5: Store concepts (with NARS deduplication) ──────────────
         concept_id_map: dict[str, str] = {}  # name → SurrealDB ID
+        # Case-insensitive lookup: lowered name → original name
+        concept_name_lower: dict[str, str] = {}
 
         for concept in parsed["concepts"]:
             name = concept["name"]
             if not name:
                 continue
 
-            # Stable ID from (doc, normalised name, type)
+            # Stable ID from normalised name + type
             key = f"{name.lower().replace(' ', '_')}_{concept['type']}"
             cid = f"concept:{hashlib.sha256(key.encode()).hexdigest()[:16]}"
             concept_id_map[name] = cid
+            concept_name_lower[name.lower()] = name
 
             # Fetch existing for NARS merge
             existing = await self._db.query(
@@ -311,30 +324,85 @@ class GraphExtractor:
                 },
             )
 
-            # chunk → concept mention edges
+            # chunk → concept mention edges (stable IDs)
             for src_chunk_id in concept.get("source_chunks", chunk_ids[:1]):
+                mention_key = f"{src_chunk_id}_{cid}"
+                mention_hash = hashlib.sha256(mention_key.encode()).hexdigest()[:16]
                 await self._db.query(
-                    "RELATE $chunk_id->mentions->$concept_id SET weight = $conf",
-                    {"chunk_id": _rid(src_chunk_id), "concept_id": _rid(cid), "conf": c},
+                    """
+                    INSERT RELATION INTO mentions {
+                        id: $id, in: $chunk_id, out: $concept_id, salience: $conf
+                    } ON DUPLICATE KEY UPDATE salience = $input.salience
+                    """,
+                    {
+                        "id": _rid(f"mentions:{mention_hash}"),
+                        "chunk_id": _rid(src_chunk_id),
+                        "concept_id": _rid(cid),
+                        "conf": c,
+                    },
                 )
 
         # ── Step 6: Store relations ───────────────────────────────────────
         rel_count = 0
+        rel_dropped = 0
         for rel in parsed["relations"]:
             subj_name = rel["subject"]
             obj_name = rel["object"]
 
-            if subj_name not in concept_id_map or obj_name not in concept_id_map:
-                continue  # Skip dangling edges
+            # Case-insensitive lookup: try exact match first, then lowered
+            if subj_name in concept_id_map:
+                subj_id = concept_id_map[subj_name]
+            elif subj_name.lower() in concept_name_lower:
+                subj_id = concept_id_map[concept_name_lower[subj_name.lower()]]
+            else:
+                rel_dropped += 1
+                if verbose:
+                    print(f"  [skip] relation subject not found: {subj_name!r}", file=sys.stderr)
+                continue
 
-            subj_id = concept_id_map[subj_name]
-            obj_id = concept_id_map[obj_name]
+            if obj_name in concept_id_map:
+                obj_id = concept_id_map[obj_name]
+            elif obj_name.lower() in concept_name_lower:
+                obj_id = concept_id_map[concept_name_lower[obj_name.lower()]]
+            else:
+                rel_dropped += 1
+                if verbose:
+                    print(f"  [skip] relation object not found: {obj_name!r}", file=sys.stderr)
+                continue
+
             verb = rel["verb"]
 
-            # Composite key for deduplication
+            # Composite key for stable deduplication ID
             rel_key = f"{subj_id}_{verb}_{obj_id}"
             rel_hash = hashlib.sha256(rel_key.encode()).hexdigest()[:16]
             rel_id = f"relates:{rel_hash}"
+
+            # Temporal contradiction detection: check for existing edges between
+            # same concepts with contradictory verbs (e.g., ENABLES vs PREVENTS)
+            _CONTRADICTIONS = {
+                "ENABLES": "PREVENTS", "PREVENTS": "ENABLES",
+                "CAUSES": "PREVENTS", "SUPPORTS": "CONTRADICTS",
+                "CONTRADICTS": "SUPPORTS", "ALLOWS": "BLOCKS",
+                "BLOCKS": "ALLOWS", "AMPLIFIES": "REDUCES",
+                "REDUCES": "AMPLIFIES", "CREATES": "DESTROYS",
+                "INITIATES": "TERMINATES", "TERMINATES": "INITIATES",
+                "INCLUDES": "EXCLUDES", "ACCELERATES": "DELAYS",
+                "DELAYS": "ACCELERATES",
+            }
+            contra_verb = _CONTRADICTIONS.get(verb)
+            if contra_verb:
+                existing_contra = await self._db.query(
+                    "SELECT id FROM relates WHERE in = $subj AND out = $obj AND verb = $verb AND valid_until IS NONE",
+                    {"subj": _rid(subj_id), "obj": _rid(obj_id), "verb": contra_verb},
+                )
+                for ec in (existing_contra or []):
+                    if isinstance(ec, dict) and ec.get("id"):
+                        await self._db.query(
+                            "UPDATE $id SET valid_until = time::now()",
+                            {"id": ec["id"]},
+                        )
+                        if verbose:
+                            print(f"  [temporal] invalidated {subj_name} --{contra_verb}--> {obj_name} (contradicted by {verb})", file=sys.stderr)
 
             # NARS merge for existing relation
             ex_rel = await self._db.query(
@@ -343,7 +411,7 @@ class GraphExtractor:
             )
             ex = ex_rel[0] if ex_rel else None
 
-            if ex and isinstance(ex, dict):
+            if ex and isinstance(ex, dict) and "nars_frequency" in ex:
                 f, c, n = nars_revise(
                     ex["nars_frequency"], ex["nars_confidence"], ex.get("evidence_count", 1),
                     rel["nars_frequency"], rel["nars_confidence"], 1,
@@ -351,44 +419,64 @@ class GraphExtractor:
             else:
                 f, c, n = rel["nars_frequency"], rel["nars_confidence"], 1
 
-            # Use RELATE for relation tables (SurrealDB v3 requires this)
-            await self._db.query(
-                """
-                RELATE $subj->relates->$obj SET
-                    verb = $verb,
-                    verb_category = $verb_category,
-                    weight = $weight,
-                    evidence = $evidence,
-                    nars_frequency = $f,
-                    nars_confidence = $c,
-                    evidence_count = $n,
-                    source_doc = $source_doc,
-                    valid_from = $valid_from,
-                    valid_until = $valid_until
-                """,
-                {
-                    "subj": _rid(subj_id),
-                    "obj": _rid(obj_id),
-                    "verb": verb,
-                    "verb_category": rel["verb_category"],
-                    "weight": c,
-                    "evidence": rel.get("evidence", ""),
-                    "f": f,
-                    "c": c,
-                    "n": n,
-                    "source_doc": _rid(doc_id),
-                    "valid_from": rel.get("valid_from"),
-                    "valid_until": rel.get("valid_until"),
-                },
-            )
-            rel_count += 1
+            # INSERT RELATION with stable ID — ON DUPLICATE KEY enables NARS revision
+            # (SurrealDB v3: UPSERT doesn't work on RELATION tables, INSERT RELATION does)
+            try:
+                await self._db.query(
+                    """
+                    INSERT RELATION INTO relates {
+                        id: $id,
+                        in: $subj,
+                        out: $obj,
+                        verb: $verb,
+                        verb_category: $verb_category,
+                        weight: $weight,
+                        evidence: $evidence,
+                        nars_frequency: $f,
+                        nars_confidence: $c,
+                        evidence_count: $n,
+                        source_doc: $source_doc,
+                        valid_from: $valid_from,
+                        valid_until: $valid_until,
+                        updated_at: time::now()
+                    } ON DUPLICATE KEY UPDATE
+                        weight = $input.weight,
+                        evidence = $input.evidence,
+                        nars_frequency = $input.nars_frequency,
+                        nars_confidence = $input.nars_confidence,
+                        evidence_count = $input.evidence_count,
+                        source_doc = $input.source_doc,
+                        updated_at = time::now()
+                    """,
+                    {
+                        "id": _rid(rel_id),
+                        "subj": _rid(subj_id),
+                        "obj": _rid(obj_id),
+                        "verb": verb,
+                        "verb_category": rel["verb_category"],
+                        "weight": c,
+                        "evidence": rel.get("evidence", ""),
+                        "f": f,
+                        "c": c,
+                        "n": n,
+                        "source_doc": _rid(doc_id),
+                        "valid_from": rel.get("valid_from"),
+                        "valid_until": rel.get("valid_until"),
+                    },
+                )
+                rel_count += 1
+            except Exception as e:
+                if verbose:
+                    print(f"  [error] storing relation {subj_name} --{verb}--> {obj_name}: {e}", file=sys.stderr)
+                rel_dropped += 1
 
         elapsed = time.perf_counter() - t0
         if verbose:
+            drop_msg = f"  dropped={rel_dropped}" if rel_dropped else ""
             print(
                 f"\n✓ Done in {elapsed:.1f}s  |  "
                 f"chunks={len(chunks)}  concepts={len(concept_id_map)}  "
-                f"relations={rel_count}  doc={doc_id}",
+                f"relations={rel_count}{drop_msg}  doc={doc_id}",
                 file=sys.stderr,
             )
 

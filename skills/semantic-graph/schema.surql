@@ -66,7 +66,7 @@ DEFINE TABLE concept SCHEMALESS
 
 DEFINE FIELD IF NOT EXISTS name        ON concept TYPE string  COMMENT "Canonical name, e.g. 'BindSpace'";
 DEFINE FIELD IF NOT EXISTS type        ON concept TYPE string
-    COMMENT "entity|system|process|idea|attribute|event|person|place|quantity|quality|relation";
+    COMMENT "person|organization|project|skill|resource|place|event|system|process|practice|idea|attribute|quantity";
 DEFINE FIELD IF NOT EXISTS description ON concept TYPE option<string>;
 DEFINE FIELD IF NOT EXISTS aliases     ON concept TYPE array<string> DEFAULT [];
 DEFINE FIELD IF NOT EXISTS rung        ON concept TYPE int    DEFAULT 0
