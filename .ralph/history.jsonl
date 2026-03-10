@@ -1,0 +1,2 @@
+{"ts":"2026-03-10T07:31:14.145864828Z","type":{"kind":"loop_started","prompt":"say hello"}}
+{"ts":"2026-03-10T07:31:39.867384692Z","type":{"kind":"loop_completed","reason":"completion_promise"}}

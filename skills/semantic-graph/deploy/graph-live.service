@@ -1,0 +1,22 @@
+# graph-live.service — Live Knowledge Graph WebSocket server
+#
+# Install:
+#   sudo cp graph-live.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now graph-live
+
+[Unit]
+Description=Knowledge Graph Live WebSocket Server
+After=network.target
+
+[Service]
+Type=simple
+User=ian
+WorkingDirectory=/home/ian/.openclaw/workspace-genesis/skills/semantic-graph
+EnvironmentFile=/home/ian/.openclaw/.env
+ExecStart=/home/ian/.openclaw/workspace-genesis/skills/semantic-graph/.venv/bin/python live_server.py --port 8788
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

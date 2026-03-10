@@ -9,6 +9,10 @@ BOOTSTRAP.md.done
 MEMORY.md
 bin/
 
+# Python artifacts
+__pycache__/
+*.pyc
+
 # Local-only — not sent to server or committed
 sync-genesis.sh
 

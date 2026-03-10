@@ -1,0 +1,5 @@
+surrealdb>=1.0.0
+httpx>=0.28.0
+openai>=1.0.0
+kreuzberg>=4.4.0
+websockets>=13.0

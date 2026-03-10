@@ -18,7 +18,9 @@ This file is server-only. It documents Genesis's operational environment — pat
 ## Env Vars (from .env)
 
 - `TELEGRAM_BOT_TOKEN` — BotFather token for Genesis
-- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REFRESH_TOKEN` — OAuth for Drive uploads (alchemy skill)
+- `GOOGLE_SERVICE_ACCOUNT_KEY` — path to service account JSON key for Drive
+- `GOOGLE_IMPERSONATE_EMAIL` — Drive owner email for impersonation
+- `GENESIS_DRIVE_FOLDER_ID` — Genesis folder ID on Google Drive
 
 ## Binaries & Paths
 
@@ -39,30 +41,78 @@ These are installed but not yet fully configured:
 ## Telegram
 
 - Bot token is at `channels.telegram.botToken` in openclaw.json (flat, not nested under accounts)
-- telegram-compose skill patched to read from this path
 - Genesis is bound to Telegram via `bindings` in openclaw.json
-- **For substantive messages (>3 lines or structured data):** Use `tg-send` helper with HTML formatting
 
-### tg-send Helper
+### Message Sending — Compulsory Rule
 
-```bash
-# Usage: tg-send "chat_id" "HTML message"
-~/.openclaw/workspace-genesis/bin/tg-send "-1001921904187" "📋 <b>Title</b>
+**Before every Telegram reply, check:**
 
-<b>Label:</b> Value
+- **Short reply (<3 lines, no structure):** Send directly via the OpenClaw `message` tool. Done.
+- **Anything else (>3 lines, or has lists/stats/sections/reports):** You **must** spawn telegram-compose as a sub-agent. Do not send long or structured messages via the `message` tool — they will look broken.
 
-• Bullet 1
-• Bullet 2"
+### How to Spawn telegram-compose
+
+The incoming message context gives you `ChatId` and `MessageThreadId` (the topic thread). **Always pass both** when available.
+
+```
+sessions_spawn(
+  model: "MiniMax-M2.1",
+  task: "Read the telegram-compose skill at skills/telegram-compose/SKILL.md for formatting rules, then format and send this content to Telegram.
+
+Chat ID: {ChatId}
+Thread ID: {MessageThreadId}
+
+Content to format:
+---
+<your raw content here>
+---
+
+After sending, reply with the message_id on success or the error on failure. Do NOT include the formatted message in your reply — it's already been sent to Telegram."
+)
 ```
 
-HTML tags supported: `<b>`, `<i>`, `<u>`, `<s>`, `<code>`, `<pre>`, `<tg-spoiler>`, `<blockquote>`, `<a href="url">`
+**After spawning:** Reply `NO_REPLY` to the main session. The sub-agent's curl call delivers to Telegram — if you also reply via the message tool, the user gets a duplicate.
 
-Rule: Use tg-send for messages with >3 lines or lists/stats/sections. Short replies OK via message tool.
+**Omit the `Thread ID:` line only** if `MessageThreadId` is empty/absent (i.e. it's a DM or non-forum group).
+
+## Knowledge Graph (Genesis Brain)
+
+Genesis has a semantic knowledge graph stored in SurrealDB with 5,000+ concepts, vector embeddings, and NARS epistemic truth values.
+
+- **Pipeline:** `~/.openclaw/workspace-genesis/skills/semantic-graph/pipeline.py`
+- **Venv:** `~/.openclaw/workspace-genesis/skills/semantic-graph/.venv/`
+- **SurrealDB:** runs as `surrealdb.service` (user systemd), `ws://127.0.0.1:8000`, namespace `semantic_graph/main`
+- **Env vars needed:** `SURREAL_PASS`, `OPENROUTER_API_KEY` (both in `~/.openclaw/.env`)
+
+### Activation pattern (required before any pipeline command):
+```bash
+cd ~/.openclaw/workspace-genesis/skills/semantic-graph
+source .venv/bin/activate
+export $(grep -v "^#" ~/.openclaw/.env | xargs)
+```
+
+### Genesis Brain scripts (in `skills/genesis-brain/scripts/`):
+| Script | Usage | Purpose |
+|--------|-------|---------|
+| `ingest.sh <file>` | Ingest a document | Returns JSON: concepts, relations, connections |
+| `query.sh "<query>"` | Semantic search | Returns JSON: results, connections |
+| `relate.sh "<A>" "<B>"` | Find relationships | Returns JSON: direct, paths, shared neighbors |
+| `capture.sh "<text>"` | Capture text snippet | Returns JSON: doc_id, counts |
+| `stats.sh` | Knowledge graph stats | Returns JSON: counts, types, verbs |
+
+### When to use the knowledge graph:
+- **User sends a file/attachment** → Run `ingest.sh` to absorb into the graph
+- **User asks "what do you know about X"** → Run `query.sh` for semantic search
+- **User asks "how does X relate to Y"** → Run `relate.sh` for graph traversal
+- **User says "remember this"** → Run `capture.sh` to store in the graph
+- **@mention in Regen Tribes with substantive content** → Silently run `capture.sh`
+- **Any question that could benefit from graph context** → Run `query.sh` and include results in a `<blockquote expandable>` via telegram-compose
 
 ## Google Drive (Alchemy Skill)
 
-- Uses OAuth refresh token flow — token refreshed via curl before each API call
-- Never expires unless revoked
+- Uses service account with domain-wide delegation (impersonates Drive owner for storage quota)
+- Env vars: `GOOGLE_SERVICE_ACCOUNT_KEY`, `GOOGLE_IMPERSONATE_EMAIL`, `GENESIS_DRIVE_FOLDER_ID`
+- Auth script: `skills/alchemy/scripts/gdrive-auth.sh`
 - Setup docs: `skills/alchemy/references/admin-setup.md`
 
 ## Gotchas
