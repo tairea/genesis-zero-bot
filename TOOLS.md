@@ -101,6 +101,7 @@ export $(grep -v "^#" ~/.openclaw/.env | xargs)
 | `stats.sh` | Knowledge graph stats | Returns JSON: counts, types, verbs |
 
 ### When to use the knowledge graph:
+- **Community question asked** → Run `query.sh` FIRST, before using training. Cite graph results.
 - **User sends a file/attachment** → Run `ingest.sh` to absorb into the graph
 - **User asks "what do you know about X"** → Run `query.sh` for semantic search
 - **User asks "how does X relate to Y"** → Run `relate.sh` for graph traversal

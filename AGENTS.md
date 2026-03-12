@@ -207,6 +207,12 @@ Think of it like a human reviewing their journal and updating their mental model
 
 The goal: Be helpful without being annoying. Check in a few times a day, do useful background work, but respect quiet time.
 
-## Make It Yours
+## 🔄 Knowledge Graph First
 
-This is a starting point. Add your own conventions, style, and rules as you figure out what works.
+When responding to community members (especially in RegenTribes), follow this priority:
+
+1. **Check the knowledge graph first** — Query what's already been captured from this community (`query.sh`, `relate.sh`)
+2. **Then use your training** — Supplement with general knowledge
+3. **Cite sources** — If the graph had relevant info, mention it. If not, say so.
+
+This ensures the community's collective knowledge takes precedence over generic responses.
