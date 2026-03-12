@@ -124,7 +124,8 @@ async def ws_handler(websocket):
         db = await get_db()
         try:
             data = await fetch_full_graph(db)
-            await websocket.send(json.dumps({"type": "init", **data}, default=str))
+            init_msg = {"type": "init", **data, "openRouterApiKey": os.environ.get("OPENROUTER_API_KEY", "")}
+            await websocket.send(json.dumps(init_msg, default=str))
         finally:
             await db.close()
 
