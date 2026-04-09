@@ -1,0 +1,2929 @@
+{
+  "nodes": [
+    {
+      "id": "Genesis",
+      "type": "author",
+      "count": 369,
+      "color": "#00FF88"
+    },
+    {
+      "id": "Vitali",
+      "type": "author",
+      "count": 246,
+      "color": "#FFD700"
+    },
+    {
+      "id": "Ian Tairea",
+      "type": "author",
+      "count": 95,
+      "color": "#FF6B6B"
+    },
+    {
+      "id": "Airic Easm",
+      "type": "author",
+      "count": 23,
+      "color": "#4ECDC4"
+    },
+    {
+      "id": "Oscar C ii \ud83d\udd3a",
+      "type": "author",
+      "count": 14,
+      "color": "#9B59B6"
+    },
+    {
+      "id": "Philipp",
+      "type": "author",
+      "count": 12,
+      "color": "#3498DB"
+    },
+    {
+      "id": "Jacob Foster",
+      "type": "author",
+      "count": 2,
+      "color": "#E67E22"
+    },
+    {
+      "id": "Anabela Gon\u00e7alves",
+      "type": "author",
+      "count": 1,
+      "color": "#E91E63"
+    },
+    {
+      "id": "Carl Welty",
+      "type": "author",
+      "count": 1,
+      "color": "#1ABC9C"
+    },
+    {
+      "id": "Justin Lofton",
+      "type": "author",
+      "count": 1,
+      "color": "#8BC34A"
+    },
+    {
+      "id": "Stefan",
+      "type": "author",
+      "count": 1,
+      "color": "#00BCD4"
+    },
+    {
+      "id": "github.com",
+      "type": "domain",
+      "count": 6,
+      "authors": [
+        "Philipp",
+        "Genesis",
+        "Ian Tairea",
+        "Oscar C ii \ud83d\udd3a",
+        "Justin Lofton",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "www.youtube.com",
+      "type": "domain",
+      "count": 3,
+      "authors": [
+        "Justin Lofton",
+        "Ian Tairea",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "youtu.be",
+      "type": "domain",
+      "count": 3,
+      "authors": [
+        "Oscar C ii \ud83d\udd3a",
+        "Airic Easm",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "t.me",
+      "type": "domain",
+      "count": 2,
+      "authors": [
+        "Ian Tairea",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "sh.rustup.rs",
+      "type": "domain",
+      "count": 2,
+      "authors": [
+        "Genesis",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "models.dev",
+      "type": "domain",
+      "count": 2,
+      "authors": [
+        "Genesis",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "artificialanalysis.ai",
+      "type": "domain",
+      "count": 2,
+      "authors": [
+        "Genesis",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "build.nvidia.com",
+      "type": "domain",
+      "count": 2,
+      "authors": [
+        "Genesis",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "public-docs.ferrocene.dev",
+      "type": "domain",
+      "count": 2,
+      "authors": [
+        "Genesis",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "ark-city-build.base44.app",
+      "type": "domain",
+      "count": 2,
+      "authors": [
+        "Airic Easm",
+        "Genesis"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "www.anthropic.com",
+      "type": "domain",
+      "count": 2,
+      "authors": [
+        "Genesis",
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "thespatialnetwork.net",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Jacob Foster"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "www.imdb.com",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "www.x402.org",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "devspot.app",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "slowroads.io",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "integralcollective.io",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "untp.unece.org",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "radicle.xyz",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "bioharmony.substack.com",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "regenliving.eco",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "landscope.earth",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "technocosm.narod.ru",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "www.linkedin.com",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "contentsignals.org",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "z.ai",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "www.linuxfoundation.org",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "community.riscv.org",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "nano-gpt.com",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "nostrapps.com",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "grantshandy.github.io",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "bonfires.ai",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Ian Tairea"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "docs.bonfires.ai",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "www.skool.com",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "Z.ai",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "huggingface.co",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "agentskills.io",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "openskills.besoeasy.com",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "deepwiki.com",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "USER.md",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "intent.md",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Ian Tairea"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "spec.md",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Ian Tairea"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "secretspec.dev",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "app.radicle.xyz",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "asterinas.github.io",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "excipio.tech",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "www.appeconomyinsights.com",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "mikeyobrien.github.io",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "text-host-hub-mo58.replit.app",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Oscar C ii \ud83d\udd3a"
+      ],
+      "color": "#888888"
+    },
+    {
+      "id": "www.alphaxiv.org",
+      "type": "domain",
+      "count": 1,
+      "authors": [
+        "Vitali"
+      ],
+      "color": "#888888"
+    }
+  ],
+  "edges": [
+    {
+      "source": "Oscar C ii \ud83d\udd3a",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Oscar C ii \ud83d\udd3a",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Oscar C ii \ud83d\udd3a",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Oscar C ii \ud83d\udd3a",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Oscar C ii \ud83d\udd3a",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Jacob Foster",
+      "target": "thespatialnetwork.net",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.imdb.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.x402.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "devspot.app",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "slowroads.io",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "integralcollective.io",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "untp.unece.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "radicle.xyz",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "bioharmony.substack.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "regenliving.eco",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "landscope.earth",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "technocosm.narod.ru",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.linkedin.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "contentsignals.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "z.ai",
+      "weight": 1
+    },
+    {
+      "source": "Airic Easm",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.linuxfoundation.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "community.riscv.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "nano-gpt.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "nostrapps.com",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "grantshandy.github.io",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "bonfires.ai",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "docs.bonfires.ai",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.skool.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "Z.ai",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "t.me",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "huggingface.co",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "huggingface.co",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "agentskills.io",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "openskills.besoeasy.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "sh.rustup.rs",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "radicle.xyz",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "USER.md",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "intent.md",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "spec.md",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Philipp",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "secretspec.dev",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "app.radicle.xyz",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "radicle.xyz",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "asterinas.github.io",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "excipio.tech",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.appeconomyinsights.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "mikeyobrien.github.io",
+      "weight": 1
+    },
+    {
+      "source": "Philipp",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Oscar C ii \ud83d\udd3a",
+      "target": "text-host-hub-mo58.replit.app",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.alphaxiv.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Airic Easm",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "t.me",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.linkedin.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.alphaxiv.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "t.me",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Airic Easm",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Airic Easm",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Airic Easm",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "huggingface.co",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "huggingface.co",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Oscar C ii \ud83d\udd3a",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "spec.md",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "spec.md",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.alphaxiv.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.alphaxiv.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.alphaxiv.org",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.alphaxiv.org",
+      "weight": 1
+    },
+    {
+      "source": "Oscar C ii \ud83d\udd3a",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "z.ai",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "z.ai",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "models.dev",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "artificialanalysis.ai",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "nano-gpt.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "build.nvidia.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "models.dev",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "artificialanalysis.ai",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "deepwiki.com",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "build.nvidia.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Ian Tairea",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "sh.rustup.rs",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "public-docs.ferrocene.dev",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "public-docs.ferrocene.dev",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "integralcollective.io",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Justin Lofton",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Justin Lofton",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Airic Easm",
+      "target": "ark-city-build.base44.app",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "ark-city-build.base44.app",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "huggingface.co",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "huggingface.co",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "youtu.be",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "build.nvidia.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "github.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.anthropic.com",
+      "weight": 1
+    },
+    {
+      "source": "Genesis",
+      "target": "www.anthropic.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    },
+    {
+      "source": "Vitali",
+      "target": "www.youtube.com",
+      "weight": 1
+    }
+  ]
+}
