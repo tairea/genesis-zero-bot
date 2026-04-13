@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obtainium Config Generator</title>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --surface: #1a1a1a;
+            --surface2: #242424;
+            --text: #e0e0e0;
+            --text-muted: #888;
+            --accent: #4a9c3d;
+            --accent-hover: #5cb848;
+            --border: #333;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: 'SF Mono', Consolas, monospace;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .output {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .output.show {
+            display: block;
+        }
+
+        .output-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .output-box {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+        }
+
+        .info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+        }
+
+        .info h3 {
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info ul {
+            margin-left: 1.25rem;
+        }
+
+        .info li {
+            margin: 0.25rem 0;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .formats {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .format-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .format-tab {
+            padding: 0.5rem 1rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .format-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .format-content {
+            display: none;
+        }
+
+        .format-content.active {
+            display: block;
+        }
+
+        code {
+            background: var(--surface2);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 0.85em;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔽 Obtainium Config Generator</h1>
+            <p class="subtitle">Convert GitHub repo URLs to Obtainium-compatible app configs</p>
+        </header>
+
+        <div class="card">
+            <label for="repo-url">GitHub Repository URL</label>
+            <input type="url" id="repo-url" placeholder="https://github.com/author/repo">
+            <p class="hint">Enter the GitHub repository URL that publishes release APKs</p>
+            <p class="error" id="error"></p>
+
+            <button onclick="generateConfig()">Generate Config</button>
+        </div>
+
+        <div class="card output" id="output-section">
+            <div class="output-label">Generated Configuration</div>
+            <div class="format-tabs">
+                <button class="format-tab active" onclick="showFormat('url')">Direct URL</button>
+                <button class="format-tab" onclick="showFormat('json')">JSON</button>
+                <button class="format-tab" onclick="showFormat('qr')">QR Code</button>
+            </div>
+
+            <div class="format-content active" id="format-url">
+                <div class="output-box" id="url-output"></div>
+                <button class="copy-btn" onclick="copyToClipboard('url-output')">📋 Copy URL</button>
+            </div>
+
+            <div class="format-content" id="format-json">
+                <div class="output-box" id="json-output"></div>
+                <button class="copy-btn" onclick="copyToClipboard('json-output')">📋 Copy JSON</button>
+            </div>
+
+            <div class="format-content" id="format-qr">
+                <div id="qr-output" style="text-align: center; padding: 1rem;"></div>
+                <p class="hint" style="text-align: center; margin-top: 0.5rem;">
+                    Scan with Obtainium's QR scanner or copy the URL/JSON above
+                </p>
+            </div>
+        </div>
+
+        <div class="card info">
+            <h3>What is Obtainium?</h3>
+            <p>Obtainium is an open-source, permissions-minimal APK manager for Android. It lets you install apps directly from GitHub releases — no App Store, no middleman.</p>
+            
+            <h3 style="margin-top: 1rem;">How to use this generator:</h3>
+            <ul>
+                <li>Enter a GitHub repo URL that publishes Android APKs in its releases</li>
+                <li>The generator creates a URL or JSON config for Obtainium</li>
+                <li>In Obtainium, tap <code>+</code> → <code>Add from Clipboard</code> (for URL) or <code>Add from QR</code></li>
+                <li>Or paste the JSON via <code>Add from Clipboard</code> if Obtainium supports it</li>
+            </ul>
+
+            <h3 style="margin-top: 1rem;">Supported URL formats:</h3>
+            <ul>
+                <li><code>https://github.com/author/repo</code></li>
+                <li><code>https://github.com/author/repo/releases</code></li>
+                <li><code>https://github.com/author/repo/releases/latest</code></li>
+            </ul>
+        </div>
+
+        <div class="card info">
+            <h3>How Obtainium finds APKs</h3>
+            <p>Obtainium scrapes the GitHub releases page and finds any <code>.apk</code> files attached to the latest release. It then:</p>
+            <ul>
+                <li>Downloads and verifies the APK</li>
+                <li>Checks for updates by comparing versions</li>
+                <li>Notifies you when updates are available</li>
+            </ul>
+            <p style="margin-top: 0.5rem;">You verify the APK signature manually (or trust the GitHub build pipeline).</p>
+        </div>
+
+        <footer>
+            <p>Generate Obtainium configs for direct APK distribution.</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://github.com/ImranR98/Obtainium" target="_blank">Get Obtainium</a> · 
+                <a href="https://github.com" target="_blank">GitHub</a> · 
+                No data is sent anywhere — runs entirely in your browser.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        function parseGitHubUrl(url) {
+            // Handle various GitHub URL formats
+            const patterns = [
+                /^https?:\/\/github\.com\/([^\/]+)\/([^\/]+?)(?:\/releases)?(?:\/latest)?\/?$/i,
+                /^https?:\/\/github\.com\/([^\/]+)\/([^\/]+)\/releases\/tag\/([^\/]+)\/?$/i,
+            ];
+
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) {
+                    return {
+                        owner: match[1],
+                        repo: match[2],
+                        tag: match[3] || null
+                    };
+                }
+            }
+
+            return null;
+        }
+
+        function generateObtainiumUrl(parsed) {
+            // Obtainium uses a custom URL scheme for configs
+            // Format: obtainium://import?p=base64(json)
+            const config = {
+                "app": {
+                    "link": `https://github.com/${parsed.owner}/${parsed.repo}`,
+                    "overrideSource": "",
+                    "additionalUrls": [],
+                    "author": parsed.owner,
+                    "name": parsed.repo,
+                    "preferredApkIndex": 0,
+                    "releaseTitleAsVersion": true,
+                    "track": "release",
+                    "version": parsed.tag || "latest",
+                    "versionExtraction": false,
+                    "versionSource": 0,
+                    "apkFilter": "",
+                    "appName": "",
+                    "includePrereleases": false,
+                    "skipSort": false,
+                    "githubUseReleaseAssets": true,
+                    "githubAllowOlderCommits": false,
+                    "autoApkFilterByArch": true
+                }
+            };
+
+            const jsonStr = JSON.stringify(config);
+            const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+            return `obtainium://import?p=${encoded}`;
+        }
+
+        function generateConfig() {
+            const urlInput = document.getElementById('repo-url').value.trim();
+            const errorEl = document.getElementById('error');
+            const outputSection = document.getElementById('output-section');
+
+            errorEl.classList.remove('show');
+            outputSection.classList.remove('show');
+
+            if (!urlInput) {
+                errorEl.textContent = 'Please enter a GitHub repository URL';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            const parsed = parseGitHubUrl(urlInput);
+
+            if (!parsed) {
+                errorEl.textContent = 'Invalid GitHub URL. Expected format: https://github.com/author/repo';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            // Generate outputs
+            const obtainiumUrl = generateObtainiumUrl(parsed);
+
+            // Generate JSON config (human-readable version)
+            const jsonConfig = {
+                "app": {
+                    "link": `https://github.com/${parsed.owner}/${parsed.repo}`,
+                    "overrideSource": "",
+                    "additionalUrls": [],
+                    "author": parsed.owner,
+                    "name": parsed.repo,
+                    "preferredApkIndex": 0,
+                    "releaseTitleAsVersion": true,
+                    "track": "release"
+                }
+            };
+
+            document.getElementById('url-output').textContent = obtainiumUrl;
+            document.getElementById('json-output').textContent = JSON.stringify(jsonConfig, null, 2);
+
+            // Generate QR code
+            generateQRCode(obtainiumUrl);
+
+            outputSection.classList.add('show');
+        }
+
+        function showFormat(format) {
+            // Update tabs
+            document.querySelectorAll('.format-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.format-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`format-${format}`).classList.add('active');
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector(`#format-${elementId.split('-')[0]} .copy-btn`);
+                const original = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    btn.textContent = original;
+                }, 2000);
+            });
+        }
+
+        function generateQRCode(text) {
+            const qrOutput = document.getElementById('qr-output');
+            
+            // Simple QR code generation using a library-free approach
+            // For production, you'd include a QR library like qrcode.js
+            // Here we'll show a message to use a QR generator
+            qrOutput.innerHTML = `
+                <div style="background: var(--surface2); padding: 2rem; border-radius: 8px;">
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        QR codes are generated client-side using your browser.
+                    </p>
+                    <p style="font-family: monospace; font-size: 0.8rem; word-break: break-all; background: var(--bg); padding: 1rem; border-radius: 4px;">
+                        ${text.substring(0, 60)}${text.length > 60 ? '...' : ''}
+                    </p>
+                    <p style="color: var(--accent); margin-top: 1rem; font-size: 0.85rem;">
+                        Install <a href="https://github.com/ImranR98/Obtainium" target="_blank" style="color: inherit;">Obtainium</a> and use the Direct URL or copy the JSON above.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Handle Enter key
+        document.getElementById('repo-url').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateConfig();
+            }
+        });
+
+        // Check for URL params (for sharing)
+        const params = new URLSearchParams(window.location.search);
+        const shareUrl = params.get('url');
+        if (shareUrl) {
+            document.getElementById('repo-url').value = shareUrl;
+            generateConfig();
+        }
+    </script>
+</body>
+</html>

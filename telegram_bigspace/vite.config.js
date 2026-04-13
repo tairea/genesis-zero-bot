@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
     root: '.',
-    base: '/big_space_telegram/',
+    base: './',
     publicDir: 'public',
     build: {
         outDir: 'dist',

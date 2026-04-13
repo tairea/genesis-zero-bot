@@ -1,0 +1,25 @@
+[app]
+# The HTML file to serve (relative to this file)
+index = "index.html"
+# The public directory for static assets
+public = "public"
+
+[build]
+# Target directory for WASM output (relative to this file)
+target = "dist"
+# Enables optimizations (s, z, or 0-3)
+opt-level = "s"
+# Enable link-time optimization
+lto = true
+
+[serve]
+# Port for the development server
+port = 8080
+# Host to bind to
+host = "0.0.0.0"
+# Open browser on start
+open = true
+
+[watch]
+# Files to watch for changes (exclude is the default)
+exclude = ["pkg"]

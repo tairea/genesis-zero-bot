@@ -1,0 +1,30 @@
+[package]
+name = "regenhub-pwa"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your@email.org>"]
+description = "RegenHub - A trust-minimized PWA starter"
+license = "AGPL-3.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+leptos = { version = "0.7", features = ["wasm-bindgen-futures"] }
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1"
+web-sys = { version = "0.3", features = ["console", "Window", "Document", "Element", "HtmlElement", "Node", "ServiceWorkerContainer", "ServiceWorker"] }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[build-dependencies]
+trunk-build = "0.1"
+
+[[bin]]
+path = "main.rs"
+name = "regenhub-pwa"
+
+[profile.release]
+opt-level = "s"
+lto = true

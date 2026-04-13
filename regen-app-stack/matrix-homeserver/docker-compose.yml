@@ -1,0 +1,89 @@
+version: '3.8'
+
+# ============================================================
+# Matrix Homeserver (Synapse) with Element Web
+# ============================================================
+#
+# Usage:
+#   1. Edit environment variables below
+#   2. Run: docker compose up -d
+#   3. Register admin: docker compose run --rm register_admin
+#
+# For detailed setup instructions, see SETUP.md
+# ============================================================
+
+services:
+  # -----------------------------------------------------------------
+  # Synapse Matrix Homeserver
+  # -----------------------------------------------------------------
+  synapse:
+    image: matrixdotorg/synapse:v1.99.0
+    container_name: matrix-synapse
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8008:8008"   # Local only — reverse proxy handles external
+      - "127.0.0.1:8448:8448"   # Federation — local only if behind reverse proxy
+    volumes:
+      - ./data:/data                    # Media cache, etc.
+      - ./synapse:/synapse              # Config files
+    environment:
+      # --- EDIT THESE ---
+      - SYNAPSE_SERVER_NAME=matrix.example.com    # Your Matrix domain
+      - SYNAPSE_REPORT_STATS=no
+    env_file:
+      - synapse.env                      # Contains secrets — keep private!
+    networks:
+      - matrix-network
+
+  # -----------------------------------------------------------------
+  # Element Web (Matrix Client UI)
+  # -----------------------------------------------------------------
+  element:
+    image: vectorized/element-web:v1.11.23
+    container_name: matrix-element
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"              # Local only — reverse proxy handles HTTPS
+    volumes:
+      - ./element-config:/usr/share/nginx/html/config:ro
+    depends_on:
+      - synapse
+    networks:
+      - matrix-network
+
+  # -----------------------------------------------------------------
+  # PostgreSQL Database
+  # Required for production use
+  # -----------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: matrix-postgres
+    restart: unless-stopped
+    environment:
+      # --- EDIT THESE ---
+      - POSTGRES_DB=synapse
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD=CHANGE_ME_in_synapse_env_file
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    networks:
+      - matrix-network
+
+  # -----------------------------------------------------------------
+  # Registration Helper Container
+  # Run once to create your admin user:
+  #   docker compose run --rm register_admin
+  # -----------------------------------------------------------------
+  register_admin:
+    image: matrixdotorg/synapse:v1.99.0
+    container_name: matrix-register
+    entrypoint: ["/bin/sh", "-c", "register_new_matrix_user $$SYNAPSE_ARGS"]
+    env_file:
+      - synapse.env
+    networks:
+      - matrix-network
+
+networks:
+  matrix-network:
+    name: matrix-network
+    driver: bridge

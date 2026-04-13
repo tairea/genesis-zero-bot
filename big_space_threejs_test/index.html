@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>big_space Three.js Test — 50×50×50 Wireframe Grid</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #080818; overflow: hidden; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        #canvas { display: block; width: 100vw; height: 100vh; }
+        #ui { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        #info {
+            position: absolute; top: 16px; left: 16px;
+            background: rgba(8,8,24,0.92); border: 1px solid rgba(0,255,136,0.4);
+            border-radius: 8px; padding: 14px 18px; font-size: 12px; line-height: 1.8;
+        }
+        #info h1 { font-size: 13px; color: #00ff88; margin-bottom: 8px; }
+        #coords {
+            position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+            background: rgba(8,8,24,0.92); border: 1px solid rgba(0,255,136,0.4);
+            border-radius: 8px; padding: 10px 20px; font-size: 13px; color: #00ff88; letter-spacing: 1px;
+        }
+        #help { position: absolute; top: 16px; right: 16px; background: rgba(8,8,24,0.92); border: 1px solid rgba(0,255,136,0.4); border-radius: 8px; padding: 12px 16px; font-size: 11px; color: #556; line-height: 1.9; }
+        #help span { color: #00ff88; }
+    </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="ui">
+    <div id="info">
+        <h1>🌿⚡ big_space Wireframe Grid</h1>
+        <div>Grid: <span style="color:#FFD700">50 × 50 × 50</span></div>
+        <div>Cells: <span style="color:#00ff88">125,000 unit cubes</span></div>
+        <div>Faces: <span style="color:#00ff88">6 × 5×5 grid lines</span></div>
+    </div>
+    <div id="coords">x: 0 &nbsp; y: 0 &nbsp; z: 0</div>
+    <div id="help"><span>Orbit</span> LMB<br><span>Pan</span> RMB<br><span>Zoom</span> scroll<br><span>Reset</span> R</div>
+</div>
+
+<script type="import">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+const GRID = 50;
+const H = GRID / 2; // 25
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x080818);
+scene.fog = new THREE.Fog(0x080818, 300, 1500);
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100000);
+camera.position.set(80, 60, 80);
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance = 5;
+controls.maxDistance = 2000;
+controls.target.set(0, 0, 0);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+scene.add(Object.assign(new THREE.DirectionalLight(0xffffff, 0.7), { position: new THREE.Vector3(80, 120, 60) }));
+
+// ─── All 125,000 unit wireframe cubes via InstancedMesh ─────────────────────
+const cellGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1));
+const cellMat = new THREE.LineBasicMaterial({ color: 0x009944, transparent: true, opacity: 0.45 });
+const NUM_CELLS = GRID * GRID * GRID;
+const cellMesh = new THREE.InstancedMesh(cellGeo, cellMat, NUM_CELLS);
+cellMesh.frustumCulled = false;
+
+const dummy = new THREE.Object3D();
+let idx = 0;
+for (let x = -H; x < H; x++) {
+    for (let y = -H; y < H; y++) {
+        for (let z = -H; z < H; z++) {
+            dummy.position.set(x + 0.5, y + 0.5, z + 0.5);
+            dummy.updateMatrix();
+            cellMesh.setMatrixAt(idx++, dummy.matrix);
+        }
+    }
+}
+cellMesh.instanceMatrix.needsUpdate = true;
+scene.add(cellMesh);
+
+// ─── 12 Boundary edges (thick outer box) ───────────────────────────────────
+const edgeVerts = [];
+const edges = [
+    [[-H,-H,-H],[H,-H,-H]], [[H,-H,-H],[H,H,-H]], [[H,H,-H],[-H,H,-H]], [[-H,H,-H],[-H,-H,-H]],
+    [[-H,-H,H],[H,-H,H]],   [[H,-H,H],[H,H,H]],   [[H,H,H],[-H,H,H]],   [[-H,H,H],[-H,-H,H]],
+    [[-H,-H,-H],[-H,-H,H]], [[H,-H,-H],[H,-H,H]], [[H,H,-H],[H,H,H]],  [[-H,H,-H],[-H,H,H]],
+];
+edges.forEach(([a,b]) => edgeVerts.push(...a,...b));
+const edgeGeo = new THREE.BufferGeometry();
+edgeGeo.setAttribute('position', new THREE.Float32BufferAttribute(edgeVerts, 3));
+scene.add(new THREE.LineSegments(edgeGeo, new THREE.LineBasicMaterial({ color: 0x00FF88, transparent: true, opacity: 1.0 })));
+
+// ─── 5×5 grid lines on each of the 6 boundary faces ───────────────────────────
+const SUBDIV = 5; // 5 divisions per face = 6 lines each direction
+const faceVerts = [];
+
+// Each face defined by 4 corner points [TL, TR, BL, BR]
+// Grid lines run along both local axes at each 1/SUBDIV interval
+function drawFaceGrid(corners) {
+    const [tl, tr, bl, br] = corners.map(c => new THREE.Vector3(...c));
+    for (let i = 0; i <= SUBDIV; i++) {
+        const t = i / SUBDIV;
+        // Line in "right" direction (tl→tr or bl→br)
+        const a = tl.clone().lerp(bl, t);
+        const b = tr.clone().lerp(br, t);
+        faceVerts.push(...a.toArray(), ...b.toArray());
+        // Line in "down" direction (tl→tr or tl→bl)
+        const c = tl.clone().lerp(tr, t);
+        const d = bl.clone().lerp(br, t);
+        faceVerts.push(...c.toArray(), ...d.toArray());
+    }
+}
+
+// z = -H face (front)
+drawFaceGrid([[-H,-H,-H],[H,-H,-H],[-H,H,-H],[H,H,-H]]);
+// z = +H face (back)
+drawFaceGrid([[-H,-H,H],[H,-H,H],[-H,H,H],[H,H,H]]);
+// x = -H face (left)
+drawFaceGrid([[-H,-H,-H],[-H,-H,H],[-H,H,-H],[-H,H,H]]);
+// x = +H face (right)
+drawFaceGrid([[H,-H,-H],[H,-H,H],[H,H,-H],[H,H,H]]);
+// y = -H face (bottom)
+drawFaceGrid([[-H,-H,-H],[H,-H,-H],[-H,-H,H],[H,-H,H]]);
+// y = +H face (top)
+drawFaceGrid([[-H,H,-H],[H,H,-H],[-H,H,H],[H,H,H]]);
+
+const faceGeo = new THREE.BufferGeometry();
+faceGeo.setAttribute('position', new THREE.Float32BufferAttribute(faceVerts, 3));
+scene.add(new THREE.LineSegments(faceGeo, new THREE.LineBasicMaterial({ color: 0x00CC66, transparent: true, opacity: 0.6 })));
+
+// ─── Axes ──────────────────────────────────────────────────────────────────────
+function addAxis(dir, label, color, start, length) {
+    const d = new THREE.Vector3(...dir).normalize();
+    scene.add(new THREE.ArrowHelper(d, new THREE.Vector3(...start), length, color, 16, 10));
+    const cv = document.createElement('canvas');
+    cv.width = 48; cv.height = 24;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#' + color.toString(16).padStart(6, '0');
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(label, 24, 12);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, depthTest: false }));
+    sp.position.copy(new THREE.Vector3(...start).addScaledVector(d, length + 18));
+    sp.scale.set(16, 8, 1);
+    scene.add(sp);
+}
+
+addAxis([1,0,0], 'X', 0xFF4444, [-GRID*1.05, -H, -H], GRID * 2.0);
+addAxis([0,1,0], 'Y', 0x44FF44, [-H, -H, -H], GRID * 2.0);
+addAxis([0,0,1], 'Z', 0x4488FF, [-H, -H, -GRID*1.05], GRID * 2.0);
+
+// ─── Center + ring ─────────────────────────────────────────────────────────────
+const cSphere = new THREE.Mesh(
+    new THREE.SphereGeometry(1.5, 16, 16),
+    new THREE.MeshBasicMaterial({ color: 0x00FF88, transparent: true, opacity: 0.9 })
+);
+cSphere.position.set(0, 0, 0);
+scene.add(cSphere);
+
+const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(3, 0.3, 8, 32),
+    new THREE.MeshBasicMaterial({ color: 0x00FF88, transparent: true, opacity: 0.7 })
+);
+ring.rotation.x = Math.PI / 2;
+scene.add(ring);
+
+// ─── Corner dots ─────────────────────────────────────────────────────────────
+const cGeo = new THREE.SphereGeometry(0.8, 8, 8);
+const cMat = new THREE.MeshBasicMaterial({ color: 0x00FF88, transparent: true, opacity: 0.7 });
+[[-H,-H,-H],[H,-H,-H],[H,H,-H],[-H,H,-H],[-H,-H,H],[H,-H,H],[H,H,H],[-H,H,H]].forEach(([x,y,z]) => {
+    const m = new THREE.Mesh(cGeo, cMat);
+    m.position.set(x, y, z);
+    scene.add(m);
+});
+
+// ─── Coordinate tracker ──────────────────────────────────────────────────────
+const coordsEl = document.getElementById('coords');
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const gPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const hit = new THREE.Vector3();
+
+renderer.domElement.addEventListener('mousemove', e => {
+    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    if (raycaster.ray.intersectPlane(gPlane, hit)) {
+        coordsEl.textContent = `x: ${Math.round(hit.x)}  y: ${Math.round(hit.y)}  z: ${Math.round(hit.z)}`;
+    }
+});
+
+window.addEventListener('keydown', e => {
+    if (e.key.toLowerCase() === 'r') {
+        camera.position.set(80, 60, 80);
+        controls.target.set(0, 0, 0);
+        controls.update();
+    }
+});
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
