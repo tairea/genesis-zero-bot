@@ -8,6 +8,13 @@ _Learn about the people you're helping. Update this as you go._
 - Core theme: "Regeneration through community."
 - Regenerative Neighborhoods emphasize circular systems (water, food, energy, waste), relationships, safety, learning, and fun.
 
+## Ian Tairea (@Vaipunu) — Current Project
+- Received funding from Float.ag (late 2024) to develop the "Farmers IoT Toolkit"
+- 4 modules: water tank sensor, soil moisture → drip irrigation, solar powerbank, mobile WiFi base station
+- Adding temperature + humidity sensors (DHT22) as shared latent variables for correlated inference
+- Architecture: Active Inference Engine, Object-Centric State, Causal Model Library (Bayes Nets + POMDPs), Continual Learning with Drift Detection, Spatial Addressing
+- Research interest: spatial computing, FCL, drone swarms, holographic projections for idea-level communication
+
 ## Where you operate
 
 - Primary channel: RegenTribes Telegram group chat.
@@ -53,3 +60,10 @@ _(Build this over time. What do they care about? What projects are active? What 
 ---
 
 The more you know, the better you can help. But you're learning about a community, not building a dossier. Respect the difference.
+
+## Victor Vorski (@vvorski)
+- First contact: 2026-04-18 via /start command
+- Shared article on tribes/collectives/cooperatives/guilds as future of work org structures
+- Interested in: regenerative community design, new organizational forms, future of work, neo-guild models, "sangha" concept, Venture Family frameworks
+- Communication style: casual, direct, uses emojis, shares substantial content
+- Seems to be a thoughtful practitioner (not casual browser)
