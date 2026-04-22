@@ -1,178 +1,217 @@
-# regen-tribes-notes — Publication Skill
+# regen-tribes-notes skill
+
+This skill governs all publication to the Radicle `regen-tribes-notes` repository.
 
 ## Repository
 
-- **RID:** `rad:z4WAr7CiNkf5JAoAb1srwi7gDz8nU`
-- **Local:** `~/.radicle/regen-tribes-notes`
-- **Branch:** `main`
-- **Browse:** https://app.radicle.xyz/nodes/iris.radicle.xyz/rad:z4WAr7CiNkf5JAoAb1srwi7gDz8nU
-
-## The Book Structure
-
-Numbers are fixed. They never change. This makes cross-references stable.
-
 ```
-000  ROOT       Entry point. Defines the whole.
-001-009  Cell    One person. One home. One skill.
-010-019  Tissue  Small groups. Trust. Roles.
-020-029  Organ   Neighborhoods. Shared infrastructure.
-030-039  System  Bioregions. Federation. Trade.
-040-049  Body    Planetary. Knowledge commons.
-050+     Special topics. FCL. AME. FOT. Etc.
+rad:z4WAr7CiNkf5JAoAb1srwi7gDz8nU/z6MkhgHUCtE8dW8S89wziVgThbCUDuK5f3A2qdbfiSXDP4Ye
 ```
 
-Four domains at every level:
+Web: https://app.radicle.xyz/nodes/iris.radicle.xyz/rad:z4WAr7CiNkf5JAoAb1srwi7gDz8nU
 
-```
-physical     What you build. Cost. Method. Material.
-social       Who does what. How decisions get made.
-information  What you know. How you know it.
-exchange     Value. Currency. Trade without extraction.
-```
+Repo path: `~/.radicle/regen-tribes-notes/`
 
-## Document Format — ASD-STE100
+## Publishing Workflow
 
-This is the only writing standard. Follow it exactly.
+When the human asks to publish a new note to regen-tribes-notes:
 
-### Frontmatter
+### Step 1: Create the document
 
-```yaml
----
-title: <title>
-number: <NNN>
-level: <level>
-domain: <domain>
----
-```
+Write a `.md` file in `~/.radicle/regen-tribes-notes/` with:
+- Number: next available (check `README.md` table, highest existing + 1)
+- Filename: `<NNN>-<slug>.md`
+- Frontmatter: `title`, `topic`, `author`, `published` (ISO date), `status: published`, `level: 3`, `domain: C`
+- Content: ASD-STE100 Simplified Technical English — one sentence per line, no paragraphs longer than 25 words
 
-- `title`: exactly as shown in the index
-- `number`: three digits, zero-padded
-- `level`: root, cell, tissue, organ, system, body
-- `domain`: physical, social, information, exchange
+### Step 2: Enforce ASCII-only encoding
 
-### Body Text
+Before committing, verify the file contains no non-ASCII characters:
 
-```
-# <title>
-
-<One sentence per line.>
-<One sentence per line.>
-
-<Thematic group.>
-
-<One sentence per line.>
-```
-
-Rules:
-1. ONE line = ONE sentence or ONE fragment.
-2. No paragraphs. Never combine sentences on the same line.
-3. Blank line between thematic groups of sentences.
-4. Max 20 words per sentence.
-5. No em-dashes.
-6. No banned words.
-7. Simple present. Active voice.
-8. Numbers: spell out one to nine. Use digits for 10 and above.
-9. One idea per sentence.
-10. Define abbreviations at the start of the body.
-
-### Banned Words
-
-leverage, utilize, optimize, holistic, synergy, very, really, quite, extremely, incredibly, basically, simply
-
-## Tech Naming Rules
-
-Use category names. Never use brand names or specific product names.
-
-| Category | Use This | Not This |
-|---|---|---|
-| Time-series storage | time-series database | any specific brand |
-| Knowledge graph | knowledge graph database | any specific brand |
-| Microcontroller | microcontroller | any specific brand |
-| Network protocol | sensor network protocol | any specific brand |
-| Construction 3D printer | construction 3D printer | any specific brand |
-| WASM runtime | WASM runtime | any specific brand |
-| Message broker | message broker | any specific brand |
-| Stream processing | stream processor | any specific brand |
-
-Exception: If the document topic IS the specific technology, use it as the example and define it.
-
-## Abbreviation Format
-
-Define on first use:
-```
-FCL stands for Formation Coding Language.
-```
-
-After first use, use the abbreviation alone.
-
-## Cross-References
-
-End with:
-```
-See [NNN], [NNN], [000].
-```
-
-Use three-digit format.
-
-## Validation
-
-Run before every publish:
-
-```
-python3 scripts/validate-ste100.py <file.md>
-```
-
-Also check: no specific tech names, no brand names, no instance names.
-
-## README Index
-
-The README is the book index. It lists all documents in order.
-
-## Append-Only Publication Rule
-
-The repository is an append-only knowledge base. This rule is non-negotiable.
-
-**ALLOWED operations:**
-- Create new document (new number, never reuse)
-- Edit existing document (add content, never remove)
-- Fix formatting, grammar, or encoding errors
-- Update cross-references
-
-**FORBIDDEN operations:**
-- Delete a document (never delete, even if incorrect)
-- Delete a section within a document (mark as deprecated instead)
-- Remove content (replace with corrected content)
-- Rename a document to a different number (numbers are permanent)
-
-**Exception:** Only direct explicit request from the human owner to edit or trash specific content.
-
-**Rationale:** Numbers provide stable cross-references. Deletion breaks the knowledge graph. Deprecation preserves the reference while signaling obsolescence.
-
-**Deprecation instead of deletion:** If content is wrong, add a frontmatter line:
-```
-status: deprecated
-```
-Then create a new corrected document with a new number.
-
-## Encoding Rules — MANDATORY
-
-**ASCII only. No Chinese. No Japanese. No Korean. No Cyrillic. No accented characters.**
-
-Never use non-ASCII characters in any document. Never copy-paste text containing non-ASCII characters. Never use placeholder text that includes non-ASCII.
-
-If you see characters like 权重 (weight), 冗長 (redundancy), 过渡 (transition), 固定链 (rigid chains), or any character from 一-龥, ㄱ-ㅎ, А-Я, immediately replace with ASCII equivalent.
-
-**Before publishing, run:**
 ```bash
 grep -Pn '[^\x00-\x7F]' <file>.md
 ```
-If any output, fix immediately.
 
-For each document created, output:
+If any output, fix immediately. Common mistakes:
+- Em dashes (`—`) → ` - `
+- Chinese characters → translate or remove
+- Box-drawing characters (`│─┌┐└┘`) → remove
+- Accented letters (`ü`, `ö`, `ä`, `é`) → replace with ASCII equivalent
+
+### Step 3: Verify abbreviation definitions
+
+Every abbreviation must be defined on first use. Use `## Abbreviations` section near the top of the document with format:
+```
+NSA is national security agency.
+```
+
+Common abbreviations that need defining:
+- AI, WASM, IoT, ECS, SurrealDB, MeTTa, Hyperon, FOT, AME, FCL, ITC, COS, FRS, CDS, OAD, RBE, NOI, OPEX, PV, LED, LP, DAO, NFT, RAG, BDD, NAL
+
+### Step 4: Update README index (append-only)
+
+Run the update script — never edit README by hand:
+
+```bash
+~/.radicle/regen-tribes-notes/update-index.sh <NNN> "<Title>"
+```
+
+The script handles finding the correct row position, inserting the new row, and verifying ASCII.
+
+If the script is not available, use this sed approach (no file loaded into context):
+
+```bash
+# Get last row number
+LAST=$(grep -E "^\| [0-9]+ \|" ~/.radicle/regen-tribes-notes/README.md | tail -1 | sed 's/| *\([0-9]*\) *|.*/\1/')
+# Insert new row after last row where number <= NNN
+NEW_N="<NNN>"
+NEW_TITLE="<Title>"
+INSERT_LINE=$(grep -nE "^\| [0-9]+ \|" ~/.radicle/regen-tribes-notes/README.md | while read line; do
+  NUM=$(echo "$line" | sed 's/| *\([0-9]*\) *|.*/\1/')
+  [ "$NUM" -le "$NEW_N" ] && echo "$line"
+done | tail -1 | cut -d: -f1)
+sed -i "${INSERT_LINE}a | $NEW_N | body | information | $NEW_TITLE |" ~/.radicle/regen-tribes-notes/README.md
+```
+
+### Step 5: Commit
+
+```bash
+cd ~/.radicle/regen-tribes-notes
+git add -A
+git commit -m "Add <NNN>: <Title>"
+```
+
+### Step 6: Verify 1:1 correspondence
+
+Before push, verify the README index exactly matches the files:
+
+```bash
+cd ~/.radicle/regen-tribes-notes
+# Count numbered .md files
+FILE_COUNT=$(ls [0-9]*.md 2>/dev/null | wc -l)
+# Count rows in README table
+ROW_COUNT=$(grep -cE "^\| [0-9]+ \| body" README.md)
+if [ "$FILE_COUNT" != "$ROW_COUNT" ]; then
+  echo "MISMATCH: $FILE_COUNT files, $ROW_COUNT rows"
+  exit 1
+fi
+echo "PASS: $FILE_COUNT files, $ROW_COUNT rows"
+```
+
+If mismatch, investigate and fix before push.
+
+### Step 7: Push
+
+```bash
+cd ~/.radicle/regen-tribes-notes
+git push rad main
+```
+
+If push fails due to SSH blocking (Hetzner VPS), the local repo is still correct — push from a machine with SSH access.
+
+## Document Numbering
+
+- Numbers are permanent. Never change a number once assigned.
+- Numbers are sequential. Use the next available number.
+- The number appears in both filename and frontmatter.
+- Example: `042-some-topic.md` with `number: 042`
+
+## ASD-STE100 Rules
+
+- Maximum 25 words per sentence
+- Maximum 20 words for procedural sentences
+- One sentence per line
+- No em-dashes
+- No bullet lists with sub-clauses
+- Spell out one to nine, use digits for 10+
+- Active voice only
+- Present tense only
+- No hedging (possibly, perhaps, might)
+- No filler (leverage, utilize, optimize, holistic, synergy)
+
+## Frontmatter Template
 
 ```
-Published: NNN-title.md
-URL: https://app.radicle.xyz/nodes/iris.radicle.xyz/rad:z4WAr7CiNkf5JAoAb1srwi7gDz8nU/tree/HEAD/<NNN>-title.md
+---
+title: "<Title>"
+topic: <topic-slug>
+author: <author>
+published: YYYY-MM-DDTHH:MM:SSZ
+status: published
+level: 3
+domain: C
+---
 ```
 
-The RID never changes. The document path is always `<NNN>-<slug>.md` where slug matches the title converted to lowercase with hyphens.
+## Content Formatting
+
+- One sentence per line (hard rule)
+- Separate major sections with `##`
+- No markdown tables — use bullet lists with short sentences
+- Use `<blockquote expandable>` for Telegram-formatted quotes
+- Keep lines under 120 characters
+
+## Encoding Rules (MANDATORY)
+
+**ASCII only. No exceptions.**
+
+Never use:
+- Chinese, Japanese, Korean, or Cyrillic characters
+- Em dashes (`—`) — use ` - `
+- Box-drawing characters (`│─┌┐└┘`)
+- Accented letters — use ASCII equivalents (TUV not TÜV)
+- Smart quotes (`" "`) — use straight quotes
+- Emoji in content — use only in examples or as markers
+
+Before every commit, run:
+```bash
+grep -Pn '[^\x00-\x7F]' <file>.md
+```
+If any output, fix before committing.
+
+## Abbreviation Definition Rules
+
+Every abbreviation must be defined on first use in every document.
+
+Format: `ABBREV is what it stands for.` in an `## Abbreviations` section near the top.
+
+Abbreviations used across docs (must be defined in each doc that uses them):
+- AI is artificial intelligence
+- WASM is webassembly
+- IoT is internet of things
+- ECS is entity component system
+- SurrealDB is surrealdb
+- MeTTa is meta-text
+- Hyperon is hyperon
+- FOT is field of trust
+- AME is affinity mapping engine
+- FCL is formation coding language
+- ITC is integrity transaction convention
+- COS is constitution operating system
+- FRS is federation relationship standard
+- CDS is coordination design system
+- OAD is ownership architecture design
+- RBE is resource-based economy
+- NOI is net operating income
+- OPEX is operating expenditure
+- PV is photovoltaic
+- LED is light-emitting diode
+- LP is limited partnership
+- DAO is decentralized autonomous organization
+- NFT is non-fungible token
+- RAG is retrieval-augmented generation
+- BDD is behavior-driven development
+- NAL is non-axiomatic logic
+
+## Skill Manifest (Deployed)
+
+- Path: `~/.openclaw/workspace-genesis/skills/regen-tribes-notes/SKILL.md`
+- Version: 2026-04-22
+
+## Important Notes
+
+- The radicle repo SKILL.md is the canonical skill. The workspace copy is for reference only.
+- Numbers are permanent once assigned. Never reuse numbers.
+- Never delete a document. Deprecate with `status: deprecated` instead.
+- The README index is the single source of truth for document inventory.
+- Always verify 1:1 correspondence between files and README rows before push.
