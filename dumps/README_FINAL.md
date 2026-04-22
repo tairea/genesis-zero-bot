@@ -1,5 +1,7 @@
 # MYTHOGEN AME — Affinity Mapping Engine
 
+*Source: RegenTribes conversation dumps — 2026*
+
 ## What This System Is
 
 A regenerative framework for community design. Technology serves community, not extracts from it. The system builds trust between people through shared values, not through engagement harvesting.

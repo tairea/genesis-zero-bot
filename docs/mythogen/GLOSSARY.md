@@ -1,4 +1,6 @@
-# MYTHOGEN FRAMEWORK GLOSSARY
+# MYTHOGEN Framework Glossary
+
+*Vic Desotelle — Mythogen AME Implementation — v1.0*
 
 ## Format
 - **STE term**: Preferred STE-compliant term

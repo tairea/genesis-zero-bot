@@ -1,6 +1,8 @@
 # RegenTribes: Anti-Capture Design Framework
 
-*Captured from conversation with Airic Easm — 2026-03-26*
+*Source: RegenTribes Telegram — 2026-03-26*
+*Participant: Airic Easm*
+*Topic: Capital capture, narrative capture, identity capture, governance capture — anti-patterns for regenerative communities*
 
 ---
 

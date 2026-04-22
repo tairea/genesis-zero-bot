@@ -1,4 +1,4 @@
-# Ralph Orchestrator Prompts - Mythogen Framework Implementation
+# Ralph Orchestrator Prompts — Mythogen Framework Implementation
 
 ## System Prompt
 
