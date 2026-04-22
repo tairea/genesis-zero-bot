@@ -53,7 +53,7 @@ Common abbreviations that need defining:
 Run the update script — never edit README by hand:
 
 ```bash
-~/.radicle/regen-tribes-notes/update-index.sh <NNN> "<Title>"
+~/.openclaw/workspace-genesis/skills/regen-tribes-notes/update-index.sh <NNN> "<Title>"
 ```
 
 The script handles finding the correct row position, inserting the new row, and verifying ASCII.
