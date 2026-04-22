@@ -154,7 +154,19 @@ status: deprecated
 ```
 Then create a new corrected document with a new number.
 
-## Confirmation
+## Encoding Rules — MANDATORY
+
+**ASCII only. No Chinese. No Japanese. No Korean. No Cyrillic. No accented characters.**
+
+Never use non-ASCII characters in any document. Never copy-paste text containing non-ASCII characters. Never use placeholder text that includes non-ASCII.
+
+If you see characters like 权重 (weight), 冗長 (redundancy), 过渡 (transition), 固定链 (rigid chains), or any character from 一-龥, ㄱ-ㅎ, А-Я, immediately replace with ASCII equivalent.
+
+**Before publishing, run:**
+```bash
+grep -Pn '[^\x00-\x7F]' <file>.md
+```
+If any output, fix immediately.
 
 For each document created, output:
 
