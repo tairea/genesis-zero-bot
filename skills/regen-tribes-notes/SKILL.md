@@ -48,32 +48,7 @@ NSA is national security agency.
 Common abbreviations that need defining:
 - AI, WASM, IoT, ECS, SurrealDB, MeTTa, Hyperon, FOT, AME, FCL, ITC, COS, FRS, CDS, OAD, RBE, NOI, OPEX, PV, LED, LP, DAO, NFT, RAG, BDD, NAL
 
-### Step 4: Update README index (append-only)
-
-Run the update script — never edit README by hand:
-
-```bash
-~/.openclaw/workspace-genesis/skills/regen-tribes-notes/update-index.sh <NNN> "<Title>"
-```
-
-The script handles finding the correct row position, inserting the new row, and verifying ASCII.
-
-If the script is not available, use this sed approach (no file loaded into context):
-
-```bash
-# Get last row number
-LAST=$(grep -E "^\| [0-9]+ \|" ~/.radicle/regen-tribes-notes/README.md | tail -1 | sed 's/| *\([0-9]*\) *|.*/\1/')
-# Insert new row after last row where number <= NNN
-NEW_N="<NNN>"
-NEW_TITLE="<Title>"
-INSERT_LINE=$(grep -nE "^\| [0-9]+ \|" ~/.radicle/regen-tribes-notes/README.md | while read line; do
-  NUM=$(echo "$line" | sed 's/| *\([0-9]*\) *|.*/\1/')
-  [ "$NUM" -le "$NEW_N" ] && echo "$line"
-done | tail -1 | cut -d: -f1)
-sed -i "${INSERT_LINE}a | $NEW_N | body | information | $NEW_TITLE |" ~/.radicle/regen-tribes-notes/README.md
-```
-
-### Step 5: Commit
+### Step 4: Commit
 
 ```bash
 cd ~/.radicle/regen-tribes-notes
@@ -81,9 +56,9 @@ git add -A
 git commit -m "Add <NNN>: <Title>"
 ```
 
-### Step 6: Verify 1:1 correspondence
+### Step 5: Verify
 
-Before push, verify the README index exactly matches the files:
+Before push, verify the README matches the files:
 
 ```bash
 cd ~/.radicle/regen-tribes-notes
@@ -100,7 +75,7 @@ echo "PASS: $FILE_COUNT files, $ROW_COUNT rows"
 
 If mismatch, investigate and fix before push.
 
-### Step 7: Push
+### Step 6: Push
 
 ```bash
 cd ~/.radicle/regen-tribes-notes
@@ -203,15 +178,48 @@ Abbreviations used across docs (must be defined in each doc that uses them):
 - BDD is behavior-driven development
 - NAL is non-axiomatic logic
 
+## ASD-STE100 Skill Reference
+
+The asd-ste100 skill contains the full ASD-STE100 Issue 9 (2025) standard:
+
+- Skill: `~/.openclaw/workspace-genesis/skills/asd-ste100/`
+- Reference rules: `references/part1-writing-rules.md`
+- Approved verbs: `references/dictionary-approved-verbs.md`
+- Banned words: `references/banned-words.md`
+- Word limits: `references/ste-limits.md`
+
+## Banned Words (Never Use)
+
+Banned words and their approved replacements:
+- utilize - use
+- leverage - use, employ, apply
+- optimize - improve, make more effective
+- holistic - complete, comprehensive, integrated
+- synergy - combined effect, cooperative interaction
+
+## Biological Metaphor Rules
+
+When using biological metaphors (ecosystem, organism, cell, tissue, membrane, neuron, synapse, metabolism), introduce the metaphor explicitly within 5 words of first use:
+
+- Ecosystem: `Ecosystem (metaphor for interconnected system dependencies):`
+- Organism: `Organism (metaphor for a self-sustaining collective):`
+- Cell: `Cell (metaphor for a basic unit or module):`
+- Tissue: `Tissue (metaphor for a connected group or network):`
+- Membrane: `Membrane (metaphor for a boundary or interface):`
+- Neuron: `Neuron (metaphor for a processing node or agent):`
+- Metabolism: `Metabolism (metaphor for operational processes):`
+
+Do not use these metaphors in titles. Use concrete terms (system, network, unit, module, group, boundary).
+
 ## Skill Manifest (Deployed)
 
 - Path: `~/.openclaw/workspace-genesis/skills/regen-tribes-notes/SKILL.md`
-- Version: 2026-04-22
+- Version: 2026-04-23
+- Supersedes: radicle-kbase skill (moved to `.deprecated-skills/radicle-kbase/`)
 
 ## Important Notes
 
-- The radicle repo SKILL.md is the canonical skill. The workspace copy is for reference only.
-- Numbers are permanent once assigned. Never reuse numbers.
-- Never delete a document. Deprecate with `status: deprecated` instead.
-- The README index is the single source of truth for document inventory.
-- Always verify 1:1 correspondence between files and README rows before push.
+- The README contains repository info only - no index table
+- Numbers are permanent once assigned. Never reuse numbers
+- Never delete a document. Deprecate with `status: deprecated` instead
+- The workspace SKILL.md is canonical, not the workspace copy
