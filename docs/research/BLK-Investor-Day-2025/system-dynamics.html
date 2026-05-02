@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLK 2025 — System Dynamics & Situational Awareness</title>
+<style>
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --card-hover: #273448;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --green: #22c55e;
+  --green-dim: #166534;
+  --red: #ef4444;
+  --red-dim: #991b1b;
+  --blue: #3b82f6;
+  --blue-dim: #1e40af;
+  --yellow: #eab308;
+  --orange: #f97316;
+  --purple: #a855f7;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.5; padding: 16px; max-width: 1100px; margin: 0 auto; }
+h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.section { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+.meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; }
+
+/* ─── KPI GRID ─── */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi { background: var(--bg); border-radius: 8px; padding: 12px; text-align: center; border: 1px solid var(--border); }
+.kpi-val { font-size: 1.5rem; font-weight: 700; color: var(--green); }
+.kpi-val.red { color: var(--red); }
+.kpi-val.blue { color: var(--blue); }
+.kpi-val.yellow { color: var(--yellow); }
+.kpi-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+/* ─── CAUSAL LOOPS ─── */
+.loop-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.loop-card { background: var(--bg); border-radius: 8px; padding: 14px; border: 1px solid var(--border); }
+.loop-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.loop-title .tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+.tag-reinforce { background: var(--green-dim); color: var(--green); }
+.tag-balance { background: var(--red-dim); color: var(--red); }
+.loop-chain { font-size: 0.8rem; color: var(--text-muted); line-height: 1.7; }
+.loop-chain span { color: var(--text); font-weight: 500; }
+.loop-chain .pos { color: var(--green); }
+.loop-chain .neg { color: var(--red); }
+
+/* ─── RISK MATRIX ─── */
+.matrix-wrapper { overflow-x: auto; }
+.matrix { display: grid; grid-template-columns: auto 1fr 1fr 1fr; grid-template-rows: auto 1fr 1fr 1fr auto; gap: 4px; min-width: 500px; font-size: 0.75rem; }
+.matrix .header { text-align: center; font-weight: 700; padding: 6px; color: var(--text-muted); }
+.matrix .y-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-weight: 700; padding: 8px 4px; color: var(--text-muted); }
+.matrix .x-label { text-align: center; font-weight: 700; padding: 6px; color: var(--text-muted); }
+.matrix .cell { border-radius: 6px; padding: 8px; min-height: 90px; display: flex; flex-direction: column; gap: 4px; }
+.matrix .cell.impact-h { }
+.matrix .cell.impact-m { }
+.matrix .cell.impact-l { }
+.matrix .prob-h { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); }
+.matrix .prob-m { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.25); }
+.matrix .prob-l { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+.matrix .axis-y { background: transparent; border: none; display: flex; align-items: center; justify-content: center; }
+.matrix .axis-x { background: transparent; border: none; }
+.risk-item { background: var(--bg); border-radius: 4px; padding: 5px 7px; border-left: 3px solid; line-height: 1.3; }
+.risk-item.hi { border-color: var(--red); }
+.risk-item.med { border-color: var(--yellow); }
+.risk-item.lo { border-color: var(--green); }
+.risk-label { font-weight: 600; color: var(--text); }
+.risk-prob { color: var(--text-muted); font-size: 0.7rem; }
+.matrix-legend { display: flex; gap: 16px; margin-top: 10px; font-size: 0.75rem; color: var(--text-muted); flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* ─── SCENARIOS ─── */
+.scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.scenario { background: var(--bg); border-radius: 8px; padding: 14px; border: 1px solid var(--border); }
+.scenario-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+.scenario-prob { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px; }
+.scenario-metric { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 3px 0; border-bottom: 1px solid var(--border); }
+.scenario-metric:last-child { border-bottom: none; }
+.scenario-metric .label { color: var(--text-muted); }
+.scenario-metric .val { font-weight: 600; }
+.scenario.bull { border-color: var(--green); }
+.scenario.bull .scenario-name { color: var(--green); }
+.scenario.bear { border-color: var(--red); }
+.scenario.bear .scenario-name { color: var(--red); }
+.scenario.base { border-color: var(--blue); }
+.scenario.base .scenario-name { color: var(--blue); }
+
+/* ─── FLYWHEEL ─── */
+.flywheel-svg { width: 100%; max-width: 700px; display: block; margin: 0 auto; }
+.s1-label { font-size: 11px; fill: var(--text); font-weight: 600; }
+.s1-sub { font-size: 9px; fill: var(--text-muted); }
+.arrow { fill: none; stroke: var(--green); stroke-width: 2; marker-end: url(#arrowGreen); }
+.arrow-neg { stroke: var(--red); marker-end: url(#arrowRed); }
+.loop-text { font-size: 9px; fill: var(--green); }
+.loop-text-neg { font-size: 9px; fill: var(--red); }
+
+/* ─── DECISION LEVER CHART ─── */
+.lever-chart { margin-top: 12px; }
+.lever-row { display: grid; grid-template-columns: 140px 1fr 60px; gap: 8px; align-items: center; margin-bottom: 8px; font-size: 0.8rem; }
+.lever-label { color: var(--text-muted); }
+.lever-bar-bg { background: var(--bg); border-radius: 4px; height: 20px; overflow: hidden; }
+.lever-bar-fill { height: 100%; border-radius: 4px; }
+.lever-val { font-weight: 700; text-align: right; }
+.bar-green { background: linear-gradient(90deg, var(--green-dim), var(--green)); }
+.bar-blue { background: linear-gradient(90deg, var(--blue-dim), var(--blue)); }
+.bar-yellow { background: linear-gradient(90deg, #854d0e, var(--yellow)); }
+.bar-red { background: linear-gradient(90deg, var(--red-dim), var(--red)); }
+
+.sentiment { font-size: 0.7rem; color: var(--text-muted); margin-top: 12px; }
+.sentiment strong { color: var(--text); }
+
+.footer { text-align: center; padding: 20px 0 10px; color: var(--text-muted); font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<h1>🔵 BlackRock 2025 — System Dynamics & Situational Awareness</h1>
+<p class="meta">Investor Day 2025 • 147-slide analysis • Integral Collective strategic context</p>
+
+<!-- ─── KPI DASHBOARD ─── -->
+<div class="section">
+<h2>📊 Situational Awareness Dashboard</h2>
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-val">$11.6T</div><div class="kpi-label">Total AUM</div></div>
+  <div class="kpi"><div class="kpi-val blue">$140B→$280B</div><div class="kpi-label">Market Cap Target 2030</div></div>
+  <div class="kpi"><div class="kpi-val">$400B</div><div class="kpi-label">PM Fundraise Target 2025-30</div></div>
+  <div class="kpi"><div class="kpi-val green">$9T→$27T</div><div class="kpi-label">ETF Industry 2030 (15% CAGR)</div></div>
+  <div class="kpi"><div class="kpi-val blue">$20B+</div><div class="kpi-label">Aladdin Addressable Market</div></div>
+  <div class="kpi"><div class="kpi-val">78%</div><div class="kpi-label">5yr Active AUM Above Median</div></div>
+  <div class="kpi"><div class="kpi-val yellow">$50B</div><div class="kpi-label">IBIT Bitcoin ETP AUM</div></div>
+  <div class="kpi"><div class="kpi-val red">~80%</div><div class="kpi-label">Revenue → Govt Contracts</div></div>
+</div>
+<div class="sentiment">
+<strong>Context:</strong> BlackRock is executing a platform capture strategy — extending the index fund commoditization play to private markets. Aladdin + Preqin = the OS for whole-portfolio coordination. The critical strategic question for RegenTribes: is this the infrastructure that communities need to interface with, or the infrastructure they need to build alternatives to?
+</div>
+</div>
+
+<!-- ─── CAUSAL LOOPS ─── -->
+<div class="section">
+<h2>🔄 Causal Loop Structure</h2>
+<div class="loop-container">
+
+<div class="loop-card">
+<div class="loop-title"><span class="tag tag-reinforce">R+</span> AUM Virtuous Cycle</div>
+<div class="loop-chain">
+<span class="pos">AUM Growth</span> → <span>Scale</span> → <span class="pos">Lower Marginal Cost</span> → <span class="pos">Better Performance</span> → <span class="pos">More AUM</span>
+</div>
+</div>
+
+<div class="loop-card">
+<div class="loop-title"><span class="tag tag-reinforce">R+</span> ETF Flywheel</div>
+<div class="loop-chain">
+<span class="pos">Net Flows</span> → <span>Scale</span> → <span class="pos">Better Liquidity</span> → <span class="pos">Lower Costs</span> → <span class="pos">More Flows</span>
+</div>
+</div>
+
+<div class="loop-card">
+<div class="loop-title"><span class="tag tag-reinforce">R+</span> Private Markets Data Flywheel</div>
+<div class="loop-chain">
+<span class="pos">Scale</span> → <span class="pos">More Data</span> → <span class="pos">Aladdin Intelligence</span> → <span class="pos">Better Decisions</span> → <span class="pos">More PM AUM</span> → <span class="pos">Scale</span>
+</div>
+</div>
+
+<div class="loop-card">
+<div class="loop-title"><span class="tag tag-reinforce">R+</span> 1BLK Network Effects</div>
+<div class="loop-chain">
+<span class="pos">Asset Owners</span> → <span class="pos">More Products</span> → <span class="pos">Deeper Relationships</span> → <span class="pos">More Asset Owners</span>
+</div>
+</div>
+
+<div class="loop-card">
+<div class="loop-title"><span class="tag tag-balance">R−</span> Regulatory Backlash</div>
+<div class="loop-chain">
+<span class="neg">AUM Concentration</span> → <span>Public Scrutiny</span> → <span class="neg">Regulatory Pressure</span> → <span class="neg">AUM Limits</span> → <span class="neg">AUM Concentration Slows</span>
+</div>
+</div>
+
+<div class="loop-card">
+<div class="loop-title"><span class="tag tag-balance">R−</span> Talent & Margin Pressure</div>
+<div class="loop-chain">
+<span class="neg">Scale</span> → <span>Complexity</span> → <span class="neg">Margin Pressure</span> → <span class="neg">Talent Cost</span> → <span class="neg">Performance Risk</span> → <span class="neg">AUM Loss</span>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- ─── FLYWHEEL SVG ─── -->
+<div class="section">
+<h2>⚙️ 1BLK Platform Flywheel</h2>
+<svg class="flywheel-svg" viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#22c55e"/></marker>
+<marker id="arrowRed" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#ef4444"/></marker>
+<marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#3b82f6"/></marker>
+</defs>
+
+<!-- Central circle -->
+<circle cx="350" cy="190" r="55" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+<text x="350" y="182" text-anchor="middle" class="s1-label">1BLK</text>
+<text x="350" y="198" text-anchor="middle" class="s1-sub">Platform</text>
+
+<!-- Node boxes -->
+<!-- ETF / iShares - top right -->
+<rect x="490" y="30" width="160" height="60" rx="8" fill="#1e293b" stroke="#22c55e" stroke-width="2"/>
+<text x="570" y="52" text-anchor="middle" class="s1-label">iShares ETFs</text>
+<text x="570" y="68" text-anchor="middle" class="s1-sub">$4.3T AUM | $390B inflows</text>
+
+<!-- Aladdin - top left -->
+<rect x="50" y="30" width="160" height="60" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+<text x="130" y="52" text-anchor="middle" class="s1-label">Aladdin</text>
+<text x="130" y="68" text-anchor="middle" class="s1-sub">$1.6B rev | $20B market</text>
+
+<!-- Private Markets - bottom right -->
+<rect x="490" y="290" width="160" height="60" rx="8" fill="#1e293b" stroke="#a855f7" stroke-width="2"/>
+<text x="570" y="312" text-anchor="middle" class="s1-label">Private Markets</text>
+<text x="570" y="328" text-anchor="middle" class="s1-sub">$400B target | GIP + HPS</text>
+
+<!-- Systematic - bottom left -->
+<rect x="50" y="290" width="160" height="60" rx="8" fill="#1e293b" stroke="#eab308" stroke-width="2"/>
+<text x="130" y="312" text-anchor="middle" class="s1-label">Systematic</text>
+<text x="130" y="328" text-anchor="middle" class="s1-sub">$317B AUM | 14% CAGR</text>
+
+<!-- Center connections -->
+<!-- Top: Aladdin → iShares -->
+<path d="M 210 60 Q 280 20 460 60" stroke="#22c55e" stroke-width="1.5" fill="none" marker-end="url(#arrowGreen)"/>
+<text x="335" y="28" text-anchor="middle" class="loop-text">Data + Risk</text>
+
+<!-- Top: iShares → Aladdin -->
+<path d="M 460 90 Q 280 130 210 90" stroke="#3b82f6" stroke-width="1.5" fill="none" marker-end="url(#arrowBlue)"/>
+<text x="335" y="118" text-anchor="middle" class="loop-text" fill="#3b82f6">Flows + alpha signals</text>
+
+<!-- Right: iShares → PM -->
+<path d="M 570 92 Q 620 160 570 288" stroke="#a855f7" stroke-width="1.5" fill="none" marker-end="url(#arrowRed)"/>
+<text x="620" y="190" text-anchor="middle" class="loop-text-neg" transform="rotate(90 620 190)">Capital allocation</text>
+
+<!-- Bottom: PM → Systematic -->
+<path d="M 460 322 Q 280 365 210 322" stroke="#eab308" stroke-width="1.5" fill="none" marker-end="url(#arrowRed)"/>
+<text x="335" y="355" text-anchor="middle" class="loop-text-neg">Alt data + signals</text>
+
+<!-- Left: Systematic → Aladdin -->
+<path d="M 50 320 Q 5 250 50 92" stroke="#3b82f6" stroke-width="1.5" fill="none" marker-end="url(#arrowBlue)"/>
+<text x="18" y="205" text-anchor="middle" class="loop-text" fill="#3b82f6" transform="rotate(-90 18 205)">AI models</text>
+
+<!-- Center hub connections -->
+<line x1="210" y1="75" x2="295" y2="150" stroke="#334155" stroke-width="1"/>
+<line x1="490" y1="75" x2="405" y2="150" stroke="#334155" stroke-width="1"/>
+<line x1="490" y1="305" x2="405" y2="230" stroke="#334155" stroke-width="1"/>
+<line x1="210" y1="305" x2="295" y2="230" stroke="#334155" stroke-width="1"/>
+
+<!-- Legend -->
+<rect x="260" y="170" width="180" height="40" rx="6" fill="rgba(15,23,42,0.9)"/>
+<circle cx="275" cy="182" r="5" fill="#22c55e"/><text x="285" y="186" class="s1-sub">Reinforcing loop</text>
+<circle cx="275" cy="200" r="5" fill="#ef4444"/><text x="285" y="204" class="s1-sub">Balancing / exposure</text>
+
+</svg>
+</div>
+
+<!-- ─── RISK-OPPORTUNITY MATRIX ─── -->
+<div class="section">
+<h2>🎯 Risk-Opportunity Matrix</h2>
+<div class="matrix-wrapper">
+<div class="matrix">
+
+<div></div>
+<div class="header x-label">LOW PROBABILITY</div>
+<div class="header x-label">MEDIUM PROBABILITY</div>
+<div class="header x-label">HIGH PROBABILITY</div>
+
+<div class="header y-label">HIGH IMPACT</div>
+
+<!-- Row: High Impact -->
+<div class="cell impact-h prob-l">
+<div class="risk-item hi">
+<div class="risk-label">AI model failure</div>
+<div class="risk-prob">Low prob · Systemic blowup</div>
+</div>
+</div>
+<div class="cell impact-h prob-m">
+<div class="risk-item hi">
+<div class="risk-label">Acquisition integration failure</div>
+<div class="risk-prob">Medium · GIP/HPS/Preqin</div>
+</div>
+<div class="risk-item med" style="margin-top:4px;">
+<div class="risk-label">PM democratization success</div>
+<div class="risk-prob">Medium · If Integral emerges</div>
+</div>
+</div>
+<div class="cell impact-h prob-h">
+<div class="risk-item hi">
+<div class="risk-label">Platform consolidation</div>
+<div class="risk-prob">High · Clients → fewer providers</div>
+</div>
+<div class="risk-item hi" style="margin-top:4px;">
+<div class="risk-label">ETF growth $9T→$27T</div>
+<div class="risk-prob">High · 15% CAGR</div>
+</div>
+<div class="risk-item hi" style="margin-top:4px;">
+<div class="risk-label">Regulatory backlash</div>
+<div class="risk-prob">High · Antitrust at $11.6T</div>
+</div>
+</div>
+
+<div class="header y-label">MEDIUM IMPACT</div>
+
+<!-- Row: Medium Impact -->
+<div class="cell impact-m prob-l">
+<div class="risk-item lo">
+<div class="risk-label">Talent concentration</div>
+<div class="risk-prob">Low prob · Key person risk</div>
+</div>
+</div>
+<div class="cell impact-m prob-m">
+<div class="risk-item med">
+<div class="risk-label">Tokenization headwinds</div>
+<div class="risk-prob">Medium · Regulatory</div>
+</div>
+<div class="risk-item med" style="margin-top:4px;">
+<div class="risk-label">Margin pressure</div>
+<div class="risk-prob">Medium · Competition</div>
+</div>
+</div>
+<div class="cell impact-m prob-h">
+<div class="risk-item med">
+<div class="risk-label">Aladdin expansion stalls</div>
+<div class="risk-prob">High · If $20B market shrinks</div>
+</div>
+</div>
+
+<div class="header y-label">LOW IMPACT</div>
+
+<!-- Row: Low Impact -->
+<div class="cell impact-l prob-l">
+<div class="risk-item lo">
+<div class="risk-label">International slowdown</div>
+<div class="risk-prob">Low · EMEA/APAC adoption</div>
+</div>
+</div>
+<div class="cell impact-l prob-m">
+<div class="risk-item lo">
+<div class="risk-label">Fixed income volatility</div>
+<div class="risk-prob">Medium · Rate uncertainty</div>
+</div>
+</div>
+<div class="cell impact-l prob-h">
+<div class="risk-item lo">
+<div class="risk-label">Performance shortfall</div>
+<div class="risk-prob">High · 78% above median at risk</div>
+</div>
+</div>
+
+</div>
+</div>
+<div class="matrix-legend">
+<div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> High Impact</div>
+<div class="legend-item"><div class="legend-dot" style="background:#eab308"></div> Medium Impact</div>
+<div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Low Impact</div>
+</div>
+</div>
+
+<!-- ─── SCENARIOS ─── -->
+<div class="section">
+<h2>🔮 Three Scenarios to 2030</h2>
+<div class="scenario-grid">
+
+<div class="scenario bear">
+<div class="scenario-name">🟥 Bear Case</div>
+<div class="scenario-prob">Probability: Low-Medium | Downside risks materialize</div>
+<div class="scenario-metric"><span class="label">AUM</span><span class="val">$8T</span></div>
+<div class="scenario-metric"><span class="label">Market Cap</span><span class="val">$150B</span></div>
+<div class="scenario-metric"><span class="label">Op. Income</span><span class="val">$9B</span></div>
+<div class="scenario-metric"><span class="label">Key risk</span><span class="val">Regulatory breakup</span></div>
+<div class="scenario-metric"><span class="label">Aladdin growth</span><span class="val">Stagnant</span></div>
+<div class="scenario-metric"><span class="label">ETF market</span><span class="val">$15T</span></div>
+</div>
+
+<div class="scenario base">
+<div class="scenario-name">🔵 Base Case</div>
+<div class="scenario-prob">Probability: Medium | Current trajectory maintained</div>
+<div class="scenario-metric"><span class="label">AUM</span><span class="val">$14T</span></div>
+<div class="scenario-metric"><span class="label">Market Cap</span><span class="val">$280B</span></div>
+<div class="scenario-metric"><span class="label">Op. Income</span><span class="val">$15B</span></div>
+<div class="scenario-metric"><span class="label">Key lever</span><span class="val">PM + Aladdin scale</span></div>
+<div class="scenario-metric"><span class="label">Aladdin growth</span><span class="val">$5B+ revenue</span></div>
+<div class="scenario-metric"><span class="label">ETF market</span><span class="val">$22T</span></div>
+</div>
+
+<div class="scenario bull">
+<div class="scenario-name">🟩 Bull Case</div>
+<div class="scenario-prob">Probability: Medium | Platform flywheel fully engaged</div>
+<div class="scenario-metric"><span class="label">AUM</span><span class="val">$18T</span></div>
+<div class="scenario-metric"><span class="label">Market Cap</span><span class="val">$400B+</span></div>
+<div class="scenario-metric"><span class="label">Op. Income</span><span class="val">$20B+</span></div>
+<div class="scenario-metric"><span class="label">Key driver</span><span class="val">PM democratization</span></div>
+<div class="scenario-metric"><span class="label">Aladdin growth</span><span class="val">$10B+ revenue</span></div>
+<div class="scenario-metric"><span class="label">ETF market</span><span class="val">$27T</span></div>
+</div>
+
+</div>
+</div>
+
+<!-- ─── DECISION LEVERS ─── -->
+<div class="section">
+<h2>⚡ Decision Leverage Map — Where BLK Has Control vs. Exposure</h2>
+<div class="lever-chart">
+
+<div class="lever-row" style="font-size:0.7rem; color:var(--text-muted); margin-bottom:4px;">
+<span>LEVER</span><span>CONTROL vs EXPOSURE (0=BLK, 100=Market)</span><span>SCORE</span>
+</div>
+
+<div class="lever-row">
+<span class="lever-label">ETF industry growth</span>
+<span class="lever-bar-bg"><div class="lever-bar-fill bar-green" style="width:30%;"></div></span>
+<span class="lever-val" style="color:var(--green);">30%</span>
+</div>
+
+<div class="lever-row">
+<span class="lever-label">Aladdin adoption</span>
+<span class="lever-bar-bg"><div class="lever-bar-fill bar-green" style="width:50%;"></div></span>
+<span class="lever-val" style="color:var(--green);">50%</span>
+</div>
+
+<div class="lever-row">
+<span class="lever-label">Private markets demand</span>
+<span class="lever-bar-bg"><div class="lever-bar-fill bar-yellow" style="width:65%;"></div></span>
+<span class="lever-val" style="color:var(--yellow);">65%</span>
+</div>
+
+<div class="lever-row">
+<span class="lever-label">Interest rate environment</span>
+<span class="lever-bar-bg"><div class="lever-bar-fill bar-red" style="width:85%;"></div></span>
+<span class="lever-val" style="color:var(--red);">85%</span>
+</div>
+
+<div class="lever-row">
+<span class="lever-label">Regulatory posture</span>
+<span class="lever-bar-bg"><div class="lever-bar-fill bar-red" style="width:80%;"></div></span>
+<span class="lever-val" style="color:var(--red);">80%</span>
+</div>
+
+<div class="lever-row">
+<span class="lever-label">Systematic alpha quality</span>
+<span class="lever-bar-bg"><div class="lever-bar-fill bar-blue" style="width:40%;"></div></span>
+<span class="lever-val" style="color:var(--blue);">40%</span>
+</div>
+
+<div class="lever-row">
+<span class="lever-label">Acquisition integration</span>
+<span class="lever-bar-bg"><div class="lever-bar-fill bar-yellow" style="width:55%;"></div></span>
+<span class="lever-val" style="color:var(--yellow);">55%</span>
+</div>
+
+<div class="lever-row">
+<span class="lever-label">Tokenization adoption</span>
+<span class="lever-bar-bg"><div class="lever-bar-fill bar-red" style="width:75%;"></div></span>
+<span class="lever-val" style="color:var(--red);">75%</span>
+</div>
+
+</div>
+<div class="sentiment">
+<strong>Reading:</strong> BLK has strong control over internal levers (Aladdin, acquisitions, ETF expansion). Largest exposures are external macro (rates, regulation) and market-driven (PM demand, tokenization). The flywheel strategy is designed to turn more external dependencies into internal control points over time — which is precisely the platform capture thesis.
+</div>
+</div>
+
+<!-- ─── INTEGRAL STRATEGIC CONTEXT ─── -->
+<div class="section" style="border-color: var(--purple);">
+<h2 style="color:var(--purple);">🌿 Integral Collective — The Structural Counter</h2>
+<div class="loop-container">
+<div class="loop-card" style="border-color:var(--purple);">
+<div class="loop-title" style="color:var(--purple);">BlackRock's Answer: Extend the Architecture</div>
+<div class="loop-chain" style="font-size:0.8rem;">
+Capital allocation via price signals. Platform capture. Scale = control. 50/30/20 portfolio model extends capitalism to the excluded — but ownership remains concentrated at the platform layer.
+</div>
+</div>
+<div class="loop-card" style="border-color:var(--green);">
+<div class="loop-title" style="color:var(--green);">Integral's Answer: Redesign the Architecture</div>
+<div class="loop-chain" style="font-size:0.8rem;">
+Post-monetary. Direct metrics. Structural incentive alignment. The only project explicitly naming the structural problem. Proto-nodes are the proof — not whitepapers or advocacy.
+</div>
+</div>
+</div>
+<div class="sentiment" style="margin-top:12px;">
+<strong>For RegenTribes:</strong> These are competing coordination paradigms for the post-market world. BLK is the near-term infrastructure. Integral is the structural alternative. The most important action is to build proto-nodes that demonstrate the Integral model actually works — because demonstrated utility is the only thing that shifts coordination norms.
+</div>
+</div>
+
+<div class="footer">
+Analysis: Genesis · Sources: BLK Investor Day 2025 (147 slides) + Integral Whitepaper + Palantir contracts
+</div>
+
+</body>
+</html>
